@@ -1,0 +1,33 @@
+{% extends 'reviews/base.html' %}
+
+{% block content %}
+<h1 class="mb-4">Последние отзывы</h1>
+
+<div class="row">
+    {% for review in reviews %}
+    <div class="col-md-6 mb-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">{{ review.enterprise.name }}</h5>
+                <div class="rating-stars mb-2">
+                    {% for i in "12345"|make_list %}
+                        {% if forloop.counter <= review.rating %}★{% else %}☆{% endif %}
+                    {% endfor %}
+                    <span class="text-muted">({{ review.rating }}/5)</span>
+                </div>
+                <p class="card-text">{{ review.text }}</p>
+                <small class="text-muted">📅 {{ review.created_at|date:"d.m.Y H:i" }}</small>
+                <br>
+                <small class="badge bg-secondary">
+                    {% if review.sentiment == 'positive' %}😊 Позитивный
+                    {% elif review.sentiment == 'negative' %}😞 Негативный
+                    {% else %}😐 Нейтральный{% endif %}
+                </small>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="alert alert-info">Пока нет отзывов. Станьте первым!</div>
+    {% endfor %}
+</div>
+{% endblock %}
