@@ -10,8 +10,8 @@ class ReviewForm(forms.ModelForm):
             'enterprise': forms.Select(attrs={'class': 'form-select'}),
             'rating': forms.Select(attrs={'class': 'form-select'}, choices=[(i, f'{i} звезд') for i in range(1, 6)]),
         }
-        labels = {
-            'enterprise': 'Предприятие',
-            'text': 'Текст отзыва',
-            'rating': 'Оценка',
-        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Сортируем предприятия по названию (алфавит)
+        self.fields['enterprise'].queryset = Enterprise.objects.order_by('name')
