@@ -3,7 +3,7 @@ from django.core.paginator import Paginator
 from .models import Review, Category, Enterprise
 from .forms import ReviewForm
 from django.db.models import Count, Avg
-import json
+import json 
 
 def index(request):
     # 1. Получаем все отзывы, упорядоченные по дате (новые сверху)
@@ -124,3 +124,20 @@ def enterprise_detail(request, enterprise_id):
         'sentiment_data': json.dumps(sentiment_data),
     }
     return render(request, 'reviews/enterprise_detail.html', context)
+
+def map_view(request):
+    # Получаем все предприятия, у которых есть координаты
+    enterprises = Enterprise.objects.exclude(latitude__isnull=True).exclude(longitude__isnull=True)
+    
+    # Для каждого предприятия считаем средний рейтинг и количество отзывов
+    for enterprise in enterprises:
+        reviews = enterprise.reviews.all()
+        avg_rating = reviews.aggregate(Avg('rating'))['rating__avg']
+        enterprise.avg_rating = round(avg_rating, 1) if avg_rating else 0
+        enterprise.reviews_count = reviews.count()
+    
+    context = {
+        'enterprises': enterprises,
+    }
+    # Используем новый шаблон
+    return render(request, 'reviews/ya_map.html', context)
