@@ -70,8 +70,9 @@ class Review(models.Model):
         blank=True, 
         null=True, 
         verbose_name="Тональность",
-        choices=[('positive', 'Позитивный'), ('neutral', 'Нейтральный'), ('negative', 'Негативный')]
+        choices=[('positive', 'Позитивный'), ('neutral', 'Нейтральный'), ('negative', 'Негативный')]        
     )
+    is_approved = models.BooleanField(default=False, verbose_name="Одобрено")
 
     def save(self, *args, **kwargs):
         # Автоматически определяем тональность, если она не задана
