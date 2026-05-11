@@ -1,0 +1,100 @@
+{% extends 'reviews/base.html' %}
+{% load static %}
+
+{% block content %}
+<h1 class="mb-4">Статистика отзывов</h1>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card text-white bg-primary mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Всего отзывов</h5>
+                <p class="card-text display-4">{{ total_reviews }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card text-white bg-success mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Средний рейтинг</h5>
+                <p class="card-text display-4">{{ avg_rating }} / 5</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header">Распределение оценок</div>
+            <div class="card-body">
+                <canvas id="ratingsChart" width="400" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header">Тональность отзывов</div>
+            <div class="card-body">
+                <canvas id="sentimentChart" width="400" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">Топ-5 предприятий по количеству отзывов</div>
+            <div class="card-body">
+                <table class="table table-striped">
+                    <thead>
+                        <tr><th>Предприятие</th><th>Кол-во отзывов</th><th>Средний рейтинг</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for e in top_enterprises %}
+                        <tr>
+                            <td>{{ e.enterprise__name }}</td>
+                            <td>{{ e.total }}</td>
+                            <td>{{ e.avg_rating|floatformat:1 }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // График распределения оценок
+    const ratingData = JSON.parse('{{ rating_distribution|safe|escapejs }}');
+    const ratingCtx = document.getElementById('ratingsChart').getContext('2d');
+    new Chart(ratingCtx, {
+        type: 'bar',
+        data: {
+            labels: ratingData.map(r => r.rating + ' звезд'),
+            datasets: [{
+                label: 'Количество отзывов',
+                data: ratingData.map(r => r.count),
+                backgroundColor: '#0d6efd'
+            }]
+        }
+    });
+
+    // График тональности
+    const sentimentData = JSON.parse('{{ sentiment_data|safe|escapejs }}');
+    const sentimentCtx = document.getElementById('sentimentChart').getContext('2d');
+    new Chart(sentimentCtx, {
+        type: 'pie',
+        data: {
+            labels: sentimentData.map(s => s.sentiment === 'positive' ? 'Позитивные' : (s.sentiment === 'negative' ? 'Негативные' : 'Нейтральные')),
+            datasets: [{
+                data: sentimentData.map(s => s.count),
+                backgroundColor: ['#198754', '#ffc107', '#dc3545']
+            }]
+        }
+    });
+</script>
+{% endblock %}
