@@ -51,7 +51,7 @@
 </div>
 
 <!-- Список отзывов (с пагинацией) -->
-<div class="row">
+<div class="row row-cards">
     {% for review in page_obj %}
     <div class="col-md-6 mb-3">
         <div class="card h-100">
@@ -71,11 +71,11 @@
                 
                 <!-- Блок текста отзыва с возможностью развернуть/свернуть -->
                 <div class="review-wrapper" data-full-text="{{ review.text|escapejs }}">
-                    <div class="review-short">
-                        {{ review.text|truncatechars:300 }}
+                    <div class="review-short pre-line">
+                        {{ review.text|truncatechars:50 }}
                     </div>
-                    <div class="review-full" style="display: none;">
-                        {{ review.text|linebreaksbr }}
+                    <div class="review-full pre-line" style="display: none;">
+                        {{ review.text }}
                     </div>
                     <button class="btn btn-link btn-sm toggle-review-btn ps-0" style="display: none;">Читать далее</button>
                 </div>
