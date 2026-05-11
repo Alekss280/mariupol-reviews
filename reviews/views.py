@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator
 from .models import Review, Category, Enterprise
 from .forms import ReviewForm
@@ -84,3 +84,43 @@ def stats(request):
         'top_enterprises': top_enterprises,
     }
     return render(request, 'reviews/stats.html', context)
+
+def enterprise_detail(request, enterprise_id):
+    enterprise = get_object_or_404(Enterprise, id=enterprise_id)
+    # Все отзывы этого предприятия
+    reviews_list = enterprise.reviews.all().order_by('-created_at')
+    
+    # Пагинация (10 отзывов на страницу)
+    paginator = Paginator(reviews_list, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    # Статистика по предприятию
+    total_reviews = reviews_list.count()
+    avg_rating = reviews_list.aggregate(Avg('rating'))['rating__avg']
+    if avg_rating:
+        avg_rating = round(avg_rating, 2)
+    else:
+        avg_rating = 0
+    
+    # Распределение оценок
+    rating_distribution = []
+    for i in range(1, 6):
+        count = reviews_list.filter(rating=i).count()
+        rating_distribution.append({'rating': i, 'count': count})
+    
+    # Распределение тональностей
+    sentiment_data = []
+    for s in ['positive', 'neutral', 'negative']:
+        count = reviews_list.filter(sentiment=s).count()
+        sentiment_data.append({'sentiment': s, 'count': count})
+    
+    context = {
+        'enterprise': enterprise,
+        'page_obj': page_obj,
+        'total_reviews': total_reviews,
+        'avg_rating': avg_rating,
+        'rating_distribution': json.dumps(rating_distribution),
+        'sentiment_data': json.dumps(sentiment_data),
+    }
+    return render(request, 'reviews/enterprise_detail.html', context)
