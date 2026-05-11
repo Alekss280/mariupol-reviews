@@ -2,6 +2,8 @@ from django.shortcuts import render, redirect
 from django.core.paginator import Paginator
 from .models import Review, Category, Enterprise
 from .forms import ReviewForm
+from django.db.models import Count, Avg
+import json
 
 def index(request):
     # 1. Получаем все отзывы, упорядоченные по дате (новые сверху)
@@ -44,3 +46,41 @@ def add_review(request):
     else:
         form = ReviewForm()
     return render(request, 'reviews/add_review.html', {'form': form})
+
+def stats(request):
+    # Общее количество отзывов
+    total_reviews = Review.objects.count()
+    # Средний рейтинг
+    avg_rating = Review.objects.aggregate(Avg('rating'))['rating__avg']
+    if avg_rating:
+        avg_rating = round(avg_rating, 2)
+    else:
+        avg_rating = 0
+    
+    # Распределение оценок (1-5)
+    rating_distribution = []
+    for i in range(1, 6):
+        count = Review.objects.filter(rating=i).count()
+        rating_distribution.append({'rating': i, 'count': count})
+    
+    # Распределение тональностей
+    sentiments = ['positive', 'neutral', 'negative']
+    sentiment_data = []
+    for s in sentiments:
+        count = Review.objects.filter(sentiment=s).count()
+        sentiment_data.append({'sentiment': s, 'count': count})
+    
+    # Топ-5 предприятий по количеству отзывов
+    top_enterprises = Review.objects.values('enterprise__name').annotate(
+        total=Count('id'), 
+        avg_rating=Avg('rating')
+    ).order_by('-total')[:5]
+    
+    context = {
+        'total_reviews': total_reviews,
+        'avg_rating': avg_rating,
+        'rating_distribution': json.dumps(rating_distribution),
+        'sentiment_data': json.dumps(sentiment_data),
+        'top_enterprises': top_enterprises,
+    }
+    return render(request, 'reviews/stats.html', context)
