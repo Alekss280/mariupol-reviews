@@ -12,25 +12,32 @@
                 <form method="post">
                     {% csrf_token %}
                     
-                    <!-- Поле выбора предприятия с адресом -->
+                    <!-- Поиск по предприятиям -->
                     <div class="mb-3">
-                        <label for="id_enterprise" class="form-label">Предприятие</label>
-                           <select name="enterprise" id="id_enterprise" class="form-select" required>
-                             {% for enterprise in form.fields.enterprise.queryset %}
-                              <option value="{{ enterprise.id }}">
-                             {{ enterprise.name }}{% if enterprise.address %} ({{ enterprise.address }}){% endif %}
-                                   </option>
-                                {% endfor %}
-                            </select>
+                        <label for="searchEnterprise" class="form-label">Поиск предприятия</label>
+                        <input type="text" id="searchEnterprise" class="form-control" placeholder="Введите название или адрес...">
                     </div>
 
-                    <!-- Поле текста отзыва -->
+                    <!-- Поле выбора предприятия (отсортировано по алфавиту) -->
+                    <div class="mb-3">
+                        <label for="id_enterprise" class="form-label">Предприятие</label>
+                        <select name="enterprise" id="id_enterprise" class="form-select" size="8" required>
+                            {% for enterprise in form.fields.enterprise.queryset %}
+                                <option value="{{ enterprise.id }}" data-search="{{ enterprise.name|lower }} {{ enterprise.address|lower }}">
+                                    {{ enterprise.name }}{% if enterprise.address %} ({{ enterprise.address }}){% endif %}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <div id="noResultsMessage" class="text-danger mt-2" style="display: none;">Ничего не найдено</div>
+                    </div>
+
+                    <!-- Текст отзыва -->
                     <div class="mb-3">
                         <label for="id_text" class="form-label">Текст отзыва</label>
                         <textarea name="text" id="id_text" rows="4" class="form-control" required placeholder="Напишите ваш отзыв..."></textarea>
                     </div>
 
-                    <!-- Поле оценки -->
+                    <!-- Оценка -->
                     <div class="mb-3">
                         <label for="id_rating" class="form-label">Оценка</label>
                         <select name="rating" id="id_rating" class="form-select" required>
@@ -49,4 +56,28 @@
     </div>
 </div>
 
+<script>
+    // Фильтрация списка предприятий по поисковому запросу
+    const searchInput = document.getElementById('searchEnterprise');
+    const selectElement = document.getElementById('id_enterprise');
+    const options = Array.from(selectElement.options);
+    const noResults = document.getElementById('noResultsMessage');
+
+    function filterEnterprises() {
+        const query = searchInput.value.toLowerCase();
+        let hasVisible = false;
+        options.forEach(option => {
+            const searchData = option.getAttribute('data-search') || '';
+            if (searchData.includes(query)) {
+                option.style.display = '';
+                hasVisible = true;
+            } else {
+                option.style.display = 'none';
+            }
+        });
+        noResults.style.display = hasVisible ? 'none' : 'block';
+    }
+
+    searchInput.addEventListener('input', filterEnterprises);
+</script>
 {% endblock %}
