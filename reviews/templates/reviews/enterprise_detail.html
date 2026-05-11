@@ -1,0 +1,175 @@
+{% extends 'reviews/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="mb-4">
+    <a href="{% url 'index' %}" class="btn btn-outline-secondary">← На главную</a>
+</div>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <h1 class="card-title">{{ enterprise.name }}</h1>
+        {% if enterprise.address %}
+            <p class="card-text">Адрес: {{ enterprise.address }}</p>
+        {% endif %}
+        <div class="row mt-3">
+            <div class="col-md-6">
+                <div class="bg-light p-3 rounded text-center">
+                    <h5>Всего отзывов</h5>
+                    <p class="display-6">{{ total_reviews }}</p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="bg-light p-3 rounded text-center">
+                    <h5>Средний рейтинг</h5>
+                    <p class="display-6">{{ avg_rating }} / 5</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Графики (только если есть отзывы) -->
+{% if total_reviews > 0 %}
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">Распределение оценок</div>
+            <div class="card-body">
+                <canvas id="ratingsChart" width="400" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">Тональность отзывов</div>
+            <div class="card-body">
+                <canvas id="sentimentChart" width="400" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Распределение оценок
+    const ratingData = JSON.parse('{{ rating_distribution|default:"[]"|escapejs }}');
+    const ratingCtx = document.getElementById('ratingsChart').getContext('2d');
+    new Chart(ratingCtx, {
+        type: 'bar',
+        data: {
+            labels: ratingData.map(r => r.rating + ' звезд'),
+            datasets: [{
+                label: 'Количество отзывов',
+                data: ratingData.map(r => r.count),
+                backgroundColor: '#0d6efd'
+            }]
+        },
+        options: {}
+    });
+
+    // Тональность
+    const sentimentData = JSON.parse('{{ sentiment_data|default:"[]"|escapejs }}');
+    const sentimentCtx = document.getElementById('sentimentChart').getContext('2d');
+    new Chart(sentimentCtx, {
+        type: 'pie',
+        data: {
+            labels: sentimentData.map(s => {
+                if (s.sentiment === 'positive') return 'Позитивные';
+                if (s.sentiment === 'negative') return 'Негативные';
+                return 'Нейтральные';
+            }),
+            datasets: [{
+                data: sentimentData.map(s => s.count),
+                backgroundColor: ['#198754', '#ffc107', '#dc3545']
+            }]
+        },
+        options: {}
+    });
+</script>
+{% endif %}
+
+<!-- Список отзывов -->
+<h3 class="mb-3">Все отзывы</h3>
+<div class="row">
+    {% for review in page_obj %}
+    <div class="col-md-12 mb-3">
+        <div class="card">
+            <div class="card-body">
+                <div class="rating-stars mb-2">
+                    {% for i in "12345"|make_list %}
+                        {% if forloop.counter <= review.rating %}★{% else %}☆{% endif %}
+                    {% endfor %}
+                    <span class="text-muted">({{ review.rating }}/5)</span>
+                </div>
+                <div class="review-wrapper" data-full-text="{{ review.text|escapejs }}">
+                    <div class="review-short">
+                        {{ review.text|truncatechars:300 }}
+                    </div>
+                    <div class="review-full" style="display: none;">
+                        {{ review.text|linebreaksbr }}
+                    </div>
+                    <button class="btn btn-link btn-sm toggle-review-btn" style="display: none;">Читать далее</button>
+                </div>
+                <small class="text-muted">📅 {{ review.created_at|date:"d.m.Y H:i" }}</small>
+                <br>
+                <small class="badge bg-secondary">
+                    {% if review.sentiment == 'positive' %}😊 Позитивный
+                    {% elif review.sentiment == 'negative' %}😞 Негативный
+                    {% else %}😐 Нейтральный{% endif %}
+                </small>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Пагинация -->
+{% if page_obj.has_other_pages %}
+<nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+            <li class="page-item"><a class="page-link" href="?page=1">Первая</a></li>
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Назад</a></li>
+        {% endif %}
+        <li class="page-item disabled"><span class="page-link">Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span></li>
+        {% if page_obj.has_next %}
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Вперёд</a></li>
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Последняя</a></li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.review-wrapper').forEach(wrapper => {
+            const shortDiv = wrapper.querySelector('.review-short');
+            const fullDiv = wrapper.querySelector('.review-full');
+            const btn = wrapper.querySelector('.toggle-review-btn');
+            const fullText = wrapper.getAttribute('data-full-text');
+            
+            if (fullText.length > 300) {
+                btn.style.display = 'inline-block';
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (fullDiv.style.display === 'none') {
+                        shortDiv.style.display = 'none';
+                        fullDiv.style.display = 'block';
+                        btn.textContent = 'Свернуть';
+                    } else {
+                        shortDiv.style.display = 'block';
+                        fullDiv.style.display = 'none';
+                        btn.textContent = 'Читать далее';
+                    }
+                });
+            } else {
+                // Короткий текст — показываем полностью, без кнопки
+                shortDiv.textContent = fullText;
+                btn.style.display = 'none';
+            }
+        });
+    });
+</script>
+
+{% endblock %}
