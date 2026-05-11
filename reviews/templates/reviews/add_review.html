@@ -11,11 +11,42 @@
                 <p class="text-muted">Все отзывы анонимны. Мы не собираем ваши персональные данные.</p>
                 <form method="post">
                     {% csrf_token %}
-                    {{ form.as_p }}
+                    
+                    <!-- Поле выбора предприятия с адресом -->
+                    <div class="mb-3">
+                        <label for="id_enterprise" class="form-label">Предприятие</label>
+                           <select name="enterprise" id="id_enterprise" class="form-select" required>
+                             {% for enterprise in form.fields.enterprise.queryset %}
+                              <option value="{{ enterprise.id }}">
+                             {{ enterprise.name }}{% if enterprise.address %} ({{ enterprise.address }}){% endif %}
+                                   </option>
+                                {% endfor %}
+                            </select>
+                    </div>
+
+                    <!-- Поле текста отзыва -->
+                    <div class="mb-3">
+                        <label for="id_text" class="form-label">Текст отзыва</label>
+                        <textarea name="text" id="id_text" rows="4" class="form-control" required placeholder="Напишите ваш отзыв..."></textarea>
+                    </div>
+
+                    <!-- Поле оценки -->
+                    <div class="mb-3">
+                        <label for="id_rating" class="form-label">Оценка</label>
+                        <select name="rating" id="id_rating" class="form-select" required>
+                            <option value="5">5 звезд</option>
+                            <option value="4">4 звезды</option>
+                            <option value="3">3 звезды</option>
+                            <option value="2">2 звезды</option>
+                            <option value="1">1 звезда</option>
+                        </select>
+                    </div>
+
                     <button type="submit" class="btn btn-success">Отправить отзыв</button>
                 </form>
             </div>
         </div>
     </div>
 </div>
+
 {% endblock %}
