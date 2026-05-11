@@ -8,6 +8,34 @@
     <style>
         .rating-stars { color: #ffc107; }
         footer { margin-top: 50px; text-align: center; padding: 20px; background: #f8f9fa; }
+        .pre-line 
+        {
+        white-space: pre-line;
+        }
+        
+         /* Чтобы карточки в одной строке были одинаковой высоты */
+        .row-cards 
+        {
+         display: flex;
+         flex-wrap: wrap;
+        }
+        .card 
+        {
+         height: 100%;
+         display: flex;
+         flex-direction: column;
+        }
+        .card-body 
+        {
+         flex: 1;
+         display: flex;
+         flex-direction: column;
+        }
+       .review-wrapper 
+       {
+         flex-grow: 1;
+       }
+
     </style>
 </head>
 <body>
