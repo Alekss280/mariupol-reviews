@@ -57,20 +57,29 @@
         <div class="card h-100">
             <div class="card-body">
                 <h5 class="card-title">
-                       <a href="{% url 'enterprise_detail' review.enterprise.id %}" class="text-decoration-none">{{ review.enterprise.name }}</a>
+                    <a href="{% url 'enterprise_detail' review.enterprise.id %}" class="text-decoration-none">{{ review.enterprise.name }}</a>
                 </h5>
-                     {% if review.enterprise.address %}
-                     <p class="card-text text-muted small">{{ review.enterprise.address }}</p>
-                    {% endif %}
+                {% if review.enterprise.address %}
+                <p class="card-text text-muted small">{{ review.enterprise.address }}</p>
+                {% endif %}
                 <div class="rating-stars mb-2">
                     {% for i in "12345"|make_list %}
                         {% if forloop.counter <= review.rating %}★{% else %}☆{% endif %}
                     {% endfor %}
                     <span class="text-muted">({{ review.rating }}/5)</span>
                 </div>
-                <p class="card-text" style="display: -webkit-box; display: box; line-clamp: 3; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">
-                     {{ review.text }}
-                </p>
+                
+                <!-- Блок текста отзыва с возможностью развернуть/свернуть -->
+                <div class="review-wrapper" data-full-text="{{ review.text|escapejs }}">
+                    <div class="review-short">
+                        {{ review.text|truncatechars:300 }}
+                    </div>
+                    <div class="review-full" style="display: none;">
+                        {{ review.text|linebreaksbr }}
+                    </div>
+                    <button class="btn btn-link btn-sm toggle-review-btn ps-0" style="display: none;">Читать далее</button>
+                </div>
+
                 <small class="text-muted">📅 {{ review.created_at|date:"d.m.Y H:i" }}</small>
                 <br>
                 <small class="badge bg-secondary">
@@ -86,7 +95,7 @@
     {% endfor %}
 </div>
 
-<!-- Пагинация (навигация по страницам) -->
+<!-- Пагинация -->
 {% if page_obj.has_other_pages %}
 <nav aria-label="Page navigation">
     <ul class="pagination justify-content-center">
@@ -114,4 +123,36 @@
     </ul>
 </nav>
 {% endif %}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.review-wrapper').forEach(wrapper => {
+            const shortDiv = wrapper.querySelector('.review-short');
+            const fullDiv = wrapper.querySelector('.review-full');
+            const btn = wrapper.querySelector('.toggle-review-btn');
+            // Берём полный текст из переменной Django (через data-атрибут, но безопасный вариант)
+            // Можно просто проверить, отличается ли short от полного текста
+            const fullText = fullDiv.textContent.trim();
+            if (fullText.length > 300) {
+                btn.style.display = 'inline-block';
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (fullDiv.style.display === 'none') {
+                        shortDiv.style.display = 'none';
+                        fullDiv.style.display = 'block';
+                        btn.textContent = 'Свернуть';
+                    } else {
+                        shortDiv.style.display = 'block';
+                        fullDiv.style.display = 'none';
+                        btn.textContent = 'Читать далее';
+                    }
+                });
+            } else {
+                // Короткий текст – показываем полностью, кнопку не показываем
+                shortDiv.textContent = fullText;
+                btn.style.display = 'none';
+            }
+        });
+    });
+</script>
 {% endblock %}
