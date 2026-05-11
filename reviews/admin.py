@@ -14,7 +14,16 @@ class EnterpriseAdmin(admin.ModelAdmin):
 
 @admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):
-    list_display = ('id', 'enterprise', 'rating', 'sentiment', 'created_at')
-    list_filter = ('rating', 'sentiment', 'enterprise__category')
+    list_display = ('id', 'enterprise', 'rating', 'sentiment', 'is_approved', 'created_at')
+    list_filter = ('is_approved', 'rating', 'sentiment')
+    list_editable = ('is_approved',)   # возможность менять флаг прямо в списке
     search_fields = ('text',)
-    readonly_fields = ('created_at', 'sentiment')
+    actions = ['approve_selected', 'disapprove_selected']
+
+    def approve_selected(self, request, queryset):
+        queryset.update(is_approved=True)
+    approve_selected.short_description = "Одобрить выбранные отзывы"
+
+    def disapprove_selected(self, request, queryset):
+        queryset.update(is_approved=False)
+    disapprove_selected.short_description = "Снять одобрение с выбранных отзывов"
