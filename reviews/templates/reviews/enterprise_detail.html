@@ -103,11 +103,11 @@
                     <span class="text-muted">({{ review.rating }}/5)</span>
                 </div>
                 <div class="review-wrapper" data-full-text="{{ review.text|escapejs }}">
-                    <div class="review-short">
-                        {{ review.text|truncatechars:300 }}
+                    <div class="review-short pre-line">
+                        {{ review.text|truncatechars:100 }}
                     </div>
-                    <div class="review-full" style="display: none;">
-                        {{ review.text|linebreaksbr }}
+                    <div class="review-full pre-line" style="display: none;">
+                        {{ review.text }}
                     </div>
                     <button class="btn btn-link btn-sm toggle-review-btn" style="display: none;">Читать далее</button>
                 </div>
@@ -147,8 +147,8 @@
             const shortDiv = wrapper.querySelector('.review-short');
             const fullDiv = wrapper.querySelector('.review-full');
             const btn = wrapper.querySelector('.toggle-review-btn');
-            const fullText = wrapper.getAttribute('data-full-text');
-            
+            // Получаем чистый текст из скрытого блока (без escapejs)
+            const fullText = fullDiv.textContent.trim();
             if (fullText.length > 300) {
                 btn.style.display = 'inline-block';
                 btn.addEventListener('click', (e) => {
@@ -164,7 +164,7 @@
                     }
                 });
             } else {
-                // Короткий текст — показываем полностью, без кнопки
+                // Короткий текст – показываем полностью, кнопку не показываем
                 shortDiv.textContent = fullText;
                 btn.style.display = 'none';
             }
