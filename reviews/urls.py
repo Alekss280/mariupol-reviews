@@ -6,4 +6,5 @@ urlpatterns = [
     path('add/', views.add_review, name='add_review'),
     path('stats/', views.stats, name='stats'),
     path('enterprise/<int:enterprise_id>/', views.enterprise_detail, name='enterprise_detail'),
+    path('ya-map/', views.map_view, name='ya_map'),
 ]
