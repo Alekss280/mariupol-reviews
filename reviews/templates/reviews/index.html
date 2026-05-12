@@ -25,7 +25,7 @@
                 <label for="category" class="form-label">Категория</label>
                 <select name="category" id="category" class="form-select">
                     <option value="">Все категории</option>
-                    {% for cat in categories %}
+                    {% for cat in categories|dictsort:"name" %}
                         <option value="{{ cat.id }}" {% if selected_category == cat.id %}selected{% endif %}>
                             {{ cat.name }}
                         </option>
@@ -33,12 +33,16 @@
                 </select>
             </div>
             <div class="col-md-5">
+                <!-- Фильтр по предприятию: позволяет выбрать конкретное предприятие из списка
+                     отсортированных по названию записей. При выборе будет сохранён выбранный
+                     элемент через переменную selected_enterprise, чтобы отметка оставалась
+                     активной при перезагрузке страницы. -->
                 <label for="enterprise" class="form-label">Предприятие</label>
                 <select name="enterprise" id="enterprise" class="form-select">
                     <option value="">Все предприятия</option>
-                    {% for ent in enterprises %}
+                    {% for ent in enterprises|dictsort:"name" %}
                         <option value="{{ ent.id }}" {% if selected_enterprise == ent.id %}selected{% endif %}>
-                            {{ ent.name }}
+                            {{ ent.name }}{% if ent.address %} - {{ ent.address }}{% endif %}
                         </option>
                     {% endfor %}
                 </select>
@@ -80,7 +84,7 @@
                     <button class="btn btn-link btn-sm toggle-review-btn ps-0" style="display: none;">Читать далее</button>
                 </div>
 
-                <small class="text-muted">📅 {{ review.created_at|date:"d.m.Y H:i" }}</small>
+                <small class="text-muted">{{ review.created_at|date:"d.m.Y H:i" }}</small>
                 <br>
                 <small class="badge bg-secondary">
                     {% if review.sentiment == 'positive' %}😊 Позитивный
