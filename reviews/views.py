@@ -67,10 +67,14 @@ def stats(request):
         count = approved_reviews.filter(sentiment=s).count()
         sentiment_data.append({'sentiment': s, 'count': count})
 
-    top_enterprises = approved_reviews.values('enterprise__name').annotate(
-        total=Count('id'),
-        avg_rating=Avg('rating')
-    ).order_by('-total')[:5]
+    top_enterprises = approved_reviews.values(
+    'enterprise__id',
+    'enterprise__name',
+    'enterprise__address' 
+).annotate(
+    total=Count('id'),
+    avg_rating=Avg('rating') 
+).order_by('-total')[:10] # Топ 10 предприятий по количеству отзывов
 
     context = {
         'total_reviews': total_reviews,
