@@ -89,8 +89,39 @@
 </script>
 {% endif %}
 
+<div id="reviews"></div>
+
+<h3 class="mb-3">Отзывы</h3>
+ <!-- Фильтры -->
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6 mb-3 mb-md-0">
+                <div class="mb-2"><strong>Тональность</strong></div>
+                <div class="btn-group" role="group">
+                    <a href="?{% if current_rating %}rating={{ current_rating }}&{% endif %}sentiment=#reviews" class="btn btn-sm {% if not current_sentiment %}btn-primary{% else %}btn-outline-secondary{% endif %}">Все</a>
+                    <a href="?{% if current_rating %}rating={{ current_rating }}&{% endif %}sentiment=positive#reviews" class="btn btn-sm {% if current_sentiment == 'positive' %}btn-primary{% else %}btn-outline-secondary{% endif %}">😊 Позитивные</a>
+                    <a href="?{% if current_rating %}rating={{ current_rating }}&{% endif %}sentiment=neutral#reviews" class="btn btn-sm {% if current_sentiment == 'neutral' %}btn-primary{% else %}btn-outline-secondary{% endif %}">😐 Нейтральные</a>
+                    <a href="?{% if current_rating %}rating={{ current_rating }}&{% endif %}sentiment=negative#reviews" class="btn btn-sm {% if current_sentiment == 'negative' %}btn-primary{% else %}btn-outline-secondary{% endif %}">😞 Негативные</a>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="mb-2"><strong>Оценка</strong></div>
+                <div class="btn-group" role="group">
+                    <a href="?{% if current_sentiment %}sentiment={{ current_sentiment }}&{% endif %}rating=#reviews" class="btn btn-sm {% if not current_rating %}btn-primary{% else %}btn-outline-secondary{% endif %}">Все</a>
+                    {% for i in "12345"|make_list %}
+                        <a href="?{% if current_sentiment %}sentiment={{ current_sentiment }}&{% endif %}rating={{ i }}#reviews" class="btn btn-sm {% if current_rating == i %}btn-primary{% else %}btn-outline-secondary{% endif %}">{{ i }}★</a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <!-- Кнопка сброса всех фильтров -->
+        <div class="mt-3">
+            <a href="?sentiment=&rating=#reviews" class="btn btn-primary btn-sm text-decoration-none">Сбросить фильтры</a>
+        </div>
+    </div>
+</div>
 <!-- Список отзывов -->
-<h3 class="mb-3">Все отзывы</h3>
 <div class="row">
     {% for review in page_obj %}
     <div class="col-md-12 mb-3">
@@ -111,7 +142,7 @@
                     </div>
                     <button class="btn btn-link btn-sm toggle-review-btn" style="display: none;">Читать далее</button>
                 </div>
-                <small class="text-muted">📅 {{ review.created_at|date:"d.m.Y H:i" }}</small>
+                <small class="text-muted">{{ review.created_at|date:"d.m.Y H:i" }}</small>
                 <br>
                 <small class="badge bg-secondary">
                     {% if review.sentiment == 'positive' %}😊 Позитивный
@@ -129,13 +160,25 @@
 <nav aria-label="Page navigation">
     <ul class="pagination justify-content-center">
         {% if page_obj.has_previous %}
-            <li class="page-item"><a class="page-link" href="?page=1">Первая</a></li>
-            <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Назад</a></li>
+            <li class="page-item">
+                <a class="page-link" href="?page=1{% if current_sentiment %}&sentiment={{ current_sentiment }}{% endif %}{% if current_rating %}&rating={{ current_rating }}{% endif %}#reviews">&laquo; Первая</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if current_sentiment %}&sentiment={{ current_sentiment }}{% endif %}{% if current_rating %}&rating={{ current_rating }}{% endif %}#reviews">Назад</a>
+            </li>
         {% endif %}
-        <li class="page-item disabled"><span class="page-link">Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span></li>
+        
+        <li class="page-item disabled">
+            <span class="page-link">Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
+        </li>
+        
         {% if page_obj.has_next %}
-            <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Вперёд</a></li>
-            <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Последняя</a></li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if current_sentiment %}&sentiment={{ current_sentiment }}{% endif %}{% if current_rating %}&rating={{ current_rating }}{% endif %}#reviews">Вперёд</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if current_sentiment %}&sentiment={{ current_sentiment }}{% endif %}{% if current_rating %}&rating={{ current_rating }}{% endif %}#reviews">Последняя &raquo;</a>
+            </li>
         {% endif %}
     </ul>
 </nav>
