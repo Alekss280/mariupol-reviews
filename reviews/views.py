@@ -96,34 +96,58 @@ def stats(request):
 
 def enterprise_detail(request, enterprise_id):
     enterprise = get_object_or_404(Enterprise, id=enterprise_id)
-    # Только одобренные отзывы этого предприятия
+    
+    # Получаем параметры фильтрации
+    sentiment_filter = request.GET.get('sentiment')
+    rating_filter = request.GET.get('rating')
+    
+    # Базовый queryset (только одобренные отзывы)
     reviews_list = enterprise.reviews.filter(is_approved=True).order_by('-created_at')
-
+    
+    # Применяем фильтр по тональности
+    if sentiment_filter in ['positive', 'neutral', 'negative']:
+        reviews_list = reviews_list.filter(sentiment=sentiment_filter)
+    
+    # Применяем фильтр по оценке
+    if rating_filter and rating_filter.isdigit() and 1 <= int(rating_filter) <= 5:
+        reviews_list = reviews_list.filter(rating=int(rating_filter))
+    
+    # Пагинация (сохраняем параметры в GET)
     paginator = Paginator(reviews_list, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-
+    
+    # Статистика по предприятию (только для отфильтрованных отзывов)
     total_reviews = reviews_list.count()
     avg_rating = reviews_list.aggregate(Avg('rating'))['rating__avg']
     avg_rating = round(avg_rating, 2) if avg_rating else 0
-
+    
+    # Распределение оценок (для графиков – по всем отзывам предприятия, а не только отфильтрованным? Лучше оставить общую статистику, чтобы графики не менялись при фильтрации. Но можно и менять – решите сами. Я оставлю общую, так логичнее.)
+    # Для единообразия оставим общую статистику (все одобренные отзывы предприятия)
+    all_reviews = enterprise.reviews.filter(is_approved=True)
+    total_all = all_reviews.count()
+    avg_all = all_reviews.aggregate(Avg('rating'))['rating__avg']
+    avg_all = round(avg_all, 2) if avg_all else 0
+    
     rating_distribution = []
     for i in range(1, 6):
-        count = reviews_list.filter(rating=i).count()
+        count = all_reviews.filter(rating=i).count()
         rating_distribution.append({'rating': i, 'count': count})
-
+    
     sentiment_data = []
     for s in ['positive', 'neutral', 'negative']:
-        count = reviews_list.filter(sentiment=s).count()
+        count = all_reviews.filter(sentiment=s).count()
         sentiment_data.append({'sentiment': s, 'count': count})
-
+    
     context = {
         'enterprise': enterprise,
         'page_obj': page_obj,
-        'total_reviews': total_reviews,
-        'avg_rating': avg_rating,
+        'total_reviews': total_all,          # общее число (для карточек)
+        'avg_rating': avg_all,
         'rating_distribution': json.dumps(rating_distribution),
         'sentiment_data': json.dumps(sentiment_data),
+        'current_sentiment': sentiment_filter,
+        'current_rating': rating_filter,
     }
     return render(request, 'reviews/enterprise_detail.html', context)
 
