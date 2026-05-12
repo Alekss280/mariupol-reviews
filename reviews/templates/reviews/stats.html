@@ -43,27 +43,35 @@
 </div>
 
 <div class="row">
-    <div class="col-md-12">
-        <div class="card">
-            <div class="card-header">Топ-5 предприятий по количеству отзывов</div>
-            <div class="card-body">
-                <table class="table">
-                    <thead>
-                        <tr><th>Предприятие</th><th>Кол-во отзывов</th><th>Средний рейтинг</th></tr>
-                    </thead>
-                    <tbody>
-                        {% for e in top_enterprises %}
-                        <tr>
-                            <td>{{ e.enterprise__name }}</td>
-                            <td>{{ e.total }}</td>
-                            <td>{{ e.avg_rating|floatformat:1 }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
+    <div class="card mt-4">
+       <div class="card-header">Топ-10 предприятий по количеству отзывов</div>
+       <div class="card-body">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Предприятие</th>
+                    <th>Адрес</th>
+                    <th>Кол-во отзывов</th>
+                    <th>Средний рейтинг</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for e in top_enterprises %}
+                <tr>
+                    <td>
+                        <a href="{% url 'enterprise_detail' e.enterprise__id %}" class="text-decoration-none text-inherit">
+                            {{ e.enterprise__name }}
+                        </a>
+                    </td>
+                    <td>{{ e.enterprise__address|default:"—" }}</td>
+                    <td>{{ e.total }}</td>
+                    <td>{{ e.avg_rating|floatformat:1 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
+  </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
