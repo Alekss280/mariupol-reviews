@@ -10,8 +10,9 @@
                 <div>
                     <h5 class="card-title mb-1">Аналитика и статистика</h5>
                     <p class="card-text text-muted">Посмотрите распределение оценок, тональность отзывов и рейтинги предприятий.</p>
+                    <div id="reviews"></div>
                 </div>
-                <a href="{% url 'stats' %}" class="btn btn-primary">Перейти к статистике →</a>
+                <a href="{% url 'stats' %}" class="btn btn-primary">Перейти к статистике →</a>                
             </div>
         </div>
     </div>
@@ -105,10 +106,10 @@
     <ul class="pagination justify-content-center">
         {% if page_obj.has_previous %}
             <li class="page-item">
-                <a class="page-link" href="?page=1{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.enterprise %}&enterprise={{ request.GET.enterprise }}{% endif %}">&laquo; Первая</a>
+                <a class="page-link" href="?page=1{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.enterprise %}&enterprise={{ request.GET.enterprise }}{% endif %}#reviews">&laquo; Первая</a>
             </li>
             <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.enterprise %}&enterprise={{ request.GET.enterprise }}{% endif %}">Назад</a>
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.enterprise %}&enterprise={{ request.GET.enterprise }}{% endif %}#reviews">Назад</a>
             </li>
         {% endif %}
 
@@ -118,10 +119,10 @@
 
         {% if page_obj.has_next %}
             <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.enterprise %}&enterprise={{ request.GET.enterprise }}{% endif %}">Вперёд</a>
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.enterprise %}&enterprise={{ request.GET.enterprise }}{% endif %}#reviews">Вперёд</a>
             </li>
             <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.enterprise %}&enterprise={{ request.GET.enterprise }}{% endif %}">Последняя &raquo;</a>
+                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.enterprise %}&enterprise={{ request.GET.enterprise }}{% endif %}#reviews">Последняя &raquo;</a>
             </li>
         {% endif %}
     </ul>
