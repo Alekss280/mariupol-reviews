@@ -67,14 +67,22 @@ def stats(request):
         count = approved_reviews.filter(sentiment=s).count()
         sentiment_data.append({'sentiment': s, 'count': count})
 
-    top_enterprises = approved_reviews.values(
-    'enterprise__id',
-    'enterprise__name',
-    'enterprise__address' 
-).annotate(
-    total=Count('id'),
-    avg_rating=Avg('rating') 
-).order_by('-total')[:10] # Топ 10 предприятий по количеству отзывов
+    # ========== НОВАЯ ЧАСТЬ: сортировка топ-10 ==========
+    sort_by = request.GET.get('sort', 'count')   # параметр из URL, по умолчанию 'count'
+
+    top_queryset = approved_reviews.values(
+        'enterprise__id',
+        'enterprise__name',
+        'enterprise__address'
+    ).annotate(
+        total=Count('id'),
+        avg_rating=Avg('rating')
+    )
+
+    if sort_by == 'rating':
+        top_enterprises = top_queryset.order_by('-avg_rating')[:10]
+    else:
+        top_enterprises = top_queryset.order_by('-total')[:10]
 
     context = {
         'total_reviews': total_reviews,
@@ -82,6 +90,7 @@ def stats(request):
         'rating_distribution': json.dumps(rating_distribution),
         'sentiment_data': json.dumps(sentiment_data),
         'top_enterprises': top_enterprises,
+        'current_sort': sort_by,   # для подсветки активной кнопки в шаблоне
     }
     return render(request, 'reviews/stats.html', context)
 
