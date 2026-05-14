@@ -37,7 +37,10 @@
         background-color: var(--bg-body);
         color: var(--text-primary);
         transition: background-color 0.3s, color 0.3s;
-        padding-top: 0px; /* как у вас */
+        padding-top: 0px;
+        min-height: 100vh; /* футер всегда внизу */
+        display: flex; /* футер всегда внизу */
+        flex-direction: column; /* футер всегда внизу */
     }
 
     /* Карточки */
@@ -57,7 +60,7 @@
 
     /* Футер */
     footer {
-        margin-top: 50px;
+        margin-top: auto; /* футер всегда внизу */
         text-align: center;
         padding: 20px;
         background-color: var(--footer-bg);
