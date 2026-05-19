@@ -161,7 +161,7 @@
     <ul class="pagination justify-content-center">
         {% if page_obj.has_previous %}
             <li class="page-item">
-                <a class="page-link" href="?page=1{% if current_sentiment %}&sentiment={{ current_sentiment }}{% endif %}{% if current_rating %}&rating={{ current_rating }}{% endif %}#reviews">&laquo; Первая</a>
+                <a class="page-link d-none d-md-block" href="?page=1{% if current_sentiment %}&sentiment={{ current_sentiment }}{% endif %}{% if current_rating %}&rating={{ current_rating }}{% endif %}#reviews">&laquo; Первая</a>
             </li>
             <li class="page-item">
                 <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if current_sentiment %}&sentiment={{ current_sentiment }}{% endif %}{% if current_rating %}&rating={{ current_rating }}{% endif %}#reviews">Назад</a>
@@ -177,7 +177,7 @@
                 <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if current_sentiment %}&sentiment={{ current_sentiment }}{% endif %}{% if current_rating %}&rating={{ current_rating }}{% endif %}#reviews">Вперёд</a>
             </li>
             <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if current_sentiment %}&sentiment={{ current_sentiment }}{% endif %}{% if current_rating %}&rating={{ current_rating }}{% endif %}#reviews">Последняя &raquo;</a>
+                <a class="page-link d-none d-md-block" href="?page={{ page_obj.paginator.num_pages }}{% if current_sentiment %}&sentiment={{ current_sentiment }}{% endif %}{% if current_rating %}&rating={{ current_rating }}{% endif %}#reviews">Последняя &raquo;</a>
             </li>
         {% endif %}
     </ul>
