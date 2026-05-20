@@ -213,7 +213,25 @@
             });
         }
 
-        // ---------- 3. Сворачивание длинных отзывов ----------
+        // ---------- 3. Обрезание длинных опций в выпадающем списке предприятий ----------
+        
+        if (enterpriseSelect) {
+            // Проходим по всем опциям, кроме первой ("Все предприятия")
+            for (let i = 1; i < enterpriseSelect.options.length; i++) {
+                const opt = enterpriseSelect.options[i];
+                const fullText = opt.textContent;
+                // Обрезаем до 150 символов (можно изменить)
+                if (fullText.length > 150) {
+                    opt.textContent = fullText.substring(0, 150) + '...';
+                }
+                // Сохраняем полный текст в атрибут title (подсказка при наведении)
+                opt.title = fullText;
+                // Дополнительно сохраняем полный текст в data-атрибут (на случай, если нужно)
+                opt.setAttribute('data-fulltext', fullText);
+            }
+        }
+
+        // ---------- 4. Сворачивание длинных отзывов ----------
         document.querySelectorAll('.review-wrapper').forEach(wrapper => {
             const shortDiv = wrapper.querySelector('.review-short');
             const fullDiv = wrapper.querySelector('.review-full');
