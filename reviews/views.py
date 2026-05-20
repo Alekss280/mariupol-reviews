@@ -27,11 +27,16 @@ def index(request):
 
     categories = Category.objects.all()
     enterprises = Enterprise.objects.all()
+    enterprises_list = [
+        {'id': e.id, 'name': e.name, 'address': e.address or ''}
+        for e in enterprises
+    ]
 
     context = {
         'page_obj': page_obj,
         'categories': categories,
         'enterprises': enterprises,
+        'enterprises_list': enterprises_list,
         'selected_category': int(category_id) if category_id else None,
         'selected_enterprise': int(enterprise_id) if enterprise_id else None,
     }
