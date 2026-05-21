@@ -1,8 +1,11 @@
 {% extends 'reviews/base.html' %}
 
 {% block content %}
+
+<!-- Заголовок главной страницы -->
 <h1 class="mb-4">Отзывы о предприятиях г. Мариуполя</h1>
 
+<!-- Блок-приглашение к статистике -->
 <div class="row mb-4">
     <div class="col-md-12">
         <div class="card bg-light border-primary">
@@ -10,20 +13,21 @@
                 <div>
                     <h5 class="card-title mb-1">Аналитика и статистика</h5>
                     <p class="card-text text-muted">Посмотрите распределение оценок, тональность отзывов и рейтинги предприятий.</p>
-                    <div id="reviews"></div>
+                    <div id="reviews"></div> <!-- якорь для прокрутки к отзывам -->
                 </div>
-                <a href="{% url 'stats' %}" class="btn btn-primary">Перейти к статистике →</a>                
+                <a href="{% url 'stats' %}" class="btn btn-primary">Перейти к статистике →</a>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Фильтрация -->
+<!-- Форма фильтрации отзывов -->
 <div class="card mb-4">
     <div class="card-body">
-        <form method="get" id="filterForm">
-            <!-- Первая строка: категория, предприятие, кнопки -->
+        <form method="get" id="filterForm" action="{% url 'index' %}#reviews">
+            <!-- Первая строка: категория, предприятие, кнопки действий -->
             <div class="row g-3 align-items-end mb-3">
+                <!-- Выбор категории -->
                 <div class="col-md-4">
                     <label class="form-label">Категория</label>
                     <select name="category" id="category" class="form-select">
@@ -35,6 +39,7 @@
                         {% endfor %}
                     </select>
                 </div>
+                <!-- Выбор предприятия (полный список, динамически обновляется через JS) -->
                 <div class="col-md-5">
                     <label class="form-label">Предприятие</label>
                     <select name="enterprise" id="enterprise" class="form-select">
@@ -46,26 +51,27 @@
                         {% endfor %}
                     </select>
                 </div>
+                <!-- Кнопки "Применить" и "Сбросить" -->
                 <div class="col-md-3 mt-2 mt-md-0">
-                   <div class="d-flex flex-wrap gap-2 justify-content-md-end">
-                    <button type="submit" class="btn btn-primary">
-                        <i href="{% url 'index' %}#reviews" class="bi bi-funnel"></i> Применить
-                    </button>
-                    <a href="{% url 'index' %}#reviews" class="btn btn-outline-secondary">
-                        <i class="bi bi-arrow-counterclockwise"></i> Сбросить
-                    </a>
-                   </div>
+                    <div class="d-flex flex-wrap gap-2 justify-content-md-end">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-funnel"></i> Применить
+                        </button>
+                        <a href="{% url 'index' %}#reviews" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-counterclockwise"></i> Сбросить
+                        </a>
+                    </div>
                 </div>
             </div>
-
-            <!-- Вторая строка: быстрый поиск с выпадающим списком результатов -->
+            <!-- Вторая строка: быстрый поиск предприятия с выпадающим списком результатов -->
             <div class="row">
                 <div class="col-12">
                     <label class="form-label">Быстрый поиск предприятия</label>
                     <div style="position: relative;">
                         <input type="text" id="quickSearch" class="form-control" autocomplete="off"
                                placeholder="Начните вводить название или адрес...">
-                        <div id="searchResults" class="list-group position-absolute w-100 shadow-sm" 
+                        <!-- Контейнер для динамических результатов поиска -->
+                        <div id="searchResults" class="list-group position-absolute w-100 shadow-sm"
                              style="display: none; z-index: 1000; max-height: 300px; overflow-y: auto;"></div>
                     </div>
                     <small class="text-muted">По мере ввода будут показаны совпадения. Кликните по результату, чтобы выбрать предприятие.</small>
@@ -75,26 +81,28 @@
     </div>
 </div>
 
-<!-- Список отзывов (с пагинацией) -->
+<!-- Список отзывов с пагинацией -->
 <div class="row row-cards">
     {% for review in page_obj %}
     <div class="col-md-6 mb-3">
         <div class="card h-100">
             <div class="card-body">
+                <!-- Название предприятия – ссылка на страницу предприятия -->
                 <h5 class="card-title">
                     <a href="{% url 'enterprise_detail' review.enterprise.id %}" class="text-decoration-none">{{ review.enterprise.name }}</a>
                 </h5>
+                <!-- Адрес предприятия, если указан -->
                 {% if review.enterprise.address %}
                 <p class="card-text text-muted small">{{ review.enterprise.address }}</p>
                 {% endif %}
+                <!-- Рейтинг звёздами -->
                 <div class="rating-stars mb-2">
                     {% for i in "12345"|make_list %}
                         {% if forloop.counter <= review.rating %}★{% else %}☆{% endif %}
                     {% endfor %}
                     <span class="text-muted">({{ review.rating }}/5)</span>
                 </div>
-                
-                <!-- Блок текста отзыва с возможностью развернуть/свернуть -->
+                <!-- Блок отзыва с возможностью развернуть/свернуть длинный текст -->
                 <div class="review-wrapper" data-full-text="{{ review.text|escapejs }}">
                     <div class="review-short pre-line">
                         {{ review.text|truncatechars:50 }}
@@ -104,9 +112,10 @@
                     </div>
                     <button class="btn btn-link btn-sm toggle-review-btn ps-0" style="display: none;">Читать далее</button>
                 </div>
-
+                <!-- Дата создания -->
                 <small class="text-muted">{{ review.created_at|date:"d.m.Y H:i" }}</small>
                 <br>
+                <!-- Тональность отзыва -->
                 <small class="badge bg-secondary">
                     {% if review.sentiment == 'positive' %}😊 Позитивный
                     {% elif review.sentiment == 'negative' %}😞 Негативный
@@ -120,7 +129,7 @@
     {% endfor %}
 </div>
 
-<!-- Пагинация -->
+<!-- Пагинация: навигация по страницам отзывов -->
 {% if page_obj.has_other_pages %}
 <nav aria-label="Page navigation">
     <ul class="pagination justify-content-center">
@@ -132,11 +141,9 @@
                 <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.enterprise %}&enterprise={{ request.GET.enterprise }}{% endif %}#reviews">Назад</a>
             </li>
         {% endif %}
-
         <li class="page-item disabled">
             <span class="page-link">Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
         </li>
-
         {% if page_obj.has_next %}
             <li class="page-item">
                 <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.enterprise %}&enterprise={{ request.GET.enterprise }}{% endif %}#reviews">Вперёд</a>
@@ -149,95 +156,139 @@
 </nav>
 {% endif %}
 
-<!-- Место, где будут храниться данные -->
+<!-- Передача списка предприятий в JavaScript для быстрого поиска (используется как резерв, но основной поиск работает через currentOptions) -->
 {{ enterprises_list|json_script:"enterprises-data" }}
 
+<!-- JavaScript для динамической работы фильтров, быстрого поиска и сворачивания отзывов -->
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // ---------- 1. Получение данных о предприятиях ----------
-        const enterprisesData = JSON.parse(document.getElementById('enterprises-data').textContent);
+        // ---------- Получение элементов DOM ----------
+        const categorySelect = document.getElementById('category'); // селект для выбора категории
+        const enterpriseSelect = document.getElementById('enterprise'); // селект для выбора предприятия (динамически обновляемый)
+        const quickSearchInput = document.getElementById('quickSearch'); // поле для быстрого поиска предприятия
+        const searchResultsContainer = document.getElementById('searchResults'); // контейнер для отображения результатов быстрого поиска
 
-        // ---------- 2. Быстрый поиск с выпадающим списком ----------
-        const searchInput = document.getElementById('quickSearch');
-        const resultsContainer = document.getElementById('searchResults');
-        const enterpriseSelect = document.getElementById('enterprise');
+        // ---------- Хранение текущих опций для быстрого поиска ----------
+        let currentOptions = []; // массив элементов <option> (без первого "Все предприятия")
 
-        if (searchInput && resultsContainer && enterpriseSelect && enterprisesData) {
-            function updateSearchResults() {
-                const query = searchInput.value.toLowerCase().trim();
-                if (query === "") {
-                    resultsContainer.style.display = 'none';
-                    return;
-                }
-                const filtered = enterprisesData.filter(ent => 
-                    ent.name.toLowerCase().includes(query) || 
-                    ent.address.toLowerCase().includes(query)
-                );
-                if (filtered.length === 0) {
-                    resultsContainer.innerHTML = '<div class="list-group-item text-muted">Ничего не найдено</div>';
-                    resultsContainer.style.display = 'block';
-                    return;
-                }
-                resultsContainer.innerHTML = '';
-                filtered.forEach(ent => {
-                    const item = document.createElement('a');
-                    item.href = '#';
-                    item.className = 'list-group-item list-group-item-action';
-                    let displayText = ent.name;
-                    if (ent.address) displayText += ' (' + ent.address + ')';
-                    item.textContent = displayText;
-                    item.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        for (let i = 0; i < enterpriseSelect.options.length; i++) {
-                            if (enterpriseSelect.options[i].value == ent.id) {
-                                enterpriseSelect.selectedIndex = i;
-                                break;
-                            }
-                        }
-                        searchInput.value = '';
-                        resultsContainer.style.display = 'none';
-                    });
-                    resultsContainer.appendChild(item);
-                });
-                resultsContainer.style.display = 'block';
-            }
-
-            document.addEventListener('click', function(e) {
-                if (!searchInput.contains(e.target) && !resultsContainer.contains(e.target)) {
-                    resultsContainer.style.display = 'none';
-                }
-            });
-            searchInput.addEventListener('input', updateSearchResults);
-            searchInput.addEventListener('focus', function() {
-                if (searchInput.value.trim() !== "") updateSearchResults();
-            });
-        }
-
-        // ---------- 3. Обрезание длинных опций в выпадающем списке предприятий ----------
-        
-        if (enterpriseSelect) {
-            // Проходим по всем опциям, кроме первой ("Все предприятия")
-            for (let i = 1; i < enterpriseSelect.options.length; i++) {
-                const opt = enterpriseSelect.options[i];
+        // ---------- Функция обновления currentOptions и обрезания длинных опций ----------
+        function updateCurrentOptions() {
+            // Получение всех опций, кроме первой
+            currentOptions = Array.from(enterpriseSelect.options).slice(1);
+            // Обрезание слишком длинного текста в опциях (для читаемости)
+            currentOptions.forEach(opt => {
                 const fullText = opt.textContent;
-                // Обрезаем до 150 символов (можно изменить)
-                if (fullText.length > 150) {
-                    opt.textContent = fullText.substring(0, 150) + '...';
+                if (fullText.length > 100) { // если текст слишком длинный, обрезается до значения 100 символов
+                    opt.textContent = fullText.substring(0, 100) + '...';
+                    opt.title = fullText;            // подсказка при наведении
+                    opt.setAttribute('data-fulltext', fullText);
+                } else {
+                    opt.title = fullText; // если текст не обрезается, сохранение его в title для единообразия
                 }
-                // Сохраняем полный текст в атрибут title (подсказка при наведении)
-                opt.title = fullText;
-                // Дополнительно сохраняем полный текст в data-атрибут (на случай, если нужно)
-                opt.setAttribute('data-fulltext', fullText);
+            });
+        }
+
+        // ---------- Функция быстрого поиска (фильтрация по текущему списку предприятий) ----------
+        function updateQuickSearchResults() {
+            const query = quickSearchInput.value.toLowerCase().trim();
+            if (!query) {
+                searchResultsContainer.style.display = 'none';
+                return;
+            }
+            // Фильтрация вариантов по тексту опции
+            const filtered = currentOptions.filter(opt => {
+                const text = opt.textContent.toLowerCase();
+                return text.includes(query);
+            });
+            if (filtered.length === 0) {
+                searchResultsContainer.innerHTML = '<div class="list-group-item text-muted">Ничего не найдено</div>';
+                searchResultsContainer.style.display = 'block';
+                return;
+            }
+            // Построение списка результатов
+            searchResultsContainer.innerHTML = '';
+            filtered.forEach(opt => {
+                const item = document.createElement('a');
+                item.href = '#';
+                item.className = 'list-group-item list-group-item-action';
+                item.textContent = opt.textContent;
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    enterpriseSelect.value = opt.value;      // установка выбранного предприятия в основной select
+                    quickSearchInput.value = '';             // очистка поля поиска
+                    searchResultsContainer.style.display = 'none';
+                });
+                searchResultsContainer.appendChild(item);
+            });
+            searchResultsContainer.style.display = 'block';
+        }
+
+        // ---------- Функция загрузки предприятий по категории (AJAX) ----------
+        // Обновляет список предприятий в select, сохраняя выбранное значение, если возможно.
+        function loadEnterprisesByCategory(categoryId, preserveSelected = true) {
+            const currentSelected = preserveSelected ? enterpriseSelect.value : "";
+            fetch(`/get-enterprises/?category_id=${categoryId}`)
+                .then(response => response.json())
+                .then(data => {
+                    enterpriseSelect.innerHTML = '<option value="">Все предприятия</option>';
+                    data.forEach(ent => {
+                        const option = document.createElement('option');
+                        option.value = ent.id;
+                        option.textContent = ent.name + (ent.address ? ` (${ent.address})` : '');
+                        enterpriseSelect.appendChild(option);
+                    });
+                    // Восстановление выбранного предприятия, если оно есть в новом списке
+                    if (preserveSelected && currentSelected && [...enterpriseSelect.options].some(opt => opt.value === currentSelected)) {
+                        enterpriseSelect.value = currentSelected;
+                    } else {
+                        enterpriseSelect.value = "";
+                    }
+                    updateCurrentOptions();             // обновление массива для быстрого поиска
+                    quickSearchInput.value = '';       // очистка поля быстрого поиска
+                    searchResultsContainer.style.display = 'none'; // скрытие результатов быстрого поиска при смене категории
+                })
+                .catch(error => console.error('Ошибка загрузки предприятий:', error));
+        }
+
+        // ---------- Инициализация при загрузке страницы (учёт GET-параметров) ----------
+        function initByUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const categoryId = urlParams.get('category');
+            if (categoryId && categoryId !== "") { // если в URL есть категория, устанавливавется и загружается предприятие по этой категории
+                if (categorySelect) categorySelect.value = categoryId;
+                loadEnterprisesByCategory(categoryId, true);
+            } else { // если категории нет, загружается все предприятия
+                loadEnterprisesByCategory("", true);
             }
         }
 
-        // ---------- 4. Сворачивание длинных отзывов ----------
+        // ---------- Обработчик изменения категории ----------
+        if (categorySelect && enterpriseSelect) {
+            categorySelect.addEventListener('change', function() {
+                const catId = categorySelect.value;
+                loadEnterprisesByCategory(catId, true);
+            });
+        }
+
+        // ---------- Назначение событий для быстрого поиска ----------
+        if (quickSearchInput && searchResultsContainer) {
+            quickSearchInput.addEventListener('input', updateQuickSearchResults);
+            quickSearchInput.addEventListener('focus', function() {
+                if (quickSearchInput.value.trim() !== "") updateQuickSearchResults();
+            });
+            // Закрытие списка при клике вне его области
+            document.addEventListener('click', function(e) {
+                if (!quickSearchInput.contains(e.target) && !searchResultsContainer.contains(e.target)) {
+                    searchResultsContainer.style.display = 'none';
+                }
+            });
+        }
+
+        // ---------- Сворачивание длинных отзывов ----------
         document.querySelectorAll('.review-wrapper').forEach(wrapper => {
             const shortDiv = wrapper.querySelector('.review-short');
             const fullDiv = wrapper.querySelector('.review-full');
             const btn = wrapper.querySelector('.toggle-review-btn');
-            // Берём полный текст из переменной Django (через data-атрибут, но безопасный вариант)
-            // Можно просто проверить, отличается ли short от полного текста
             if (!fullDiv) return;
             const fullText = fullDiv.textContent.trim();
             if (fullText.length > 300) {
@@ -255,11 +306,14 @@
                     }
                 });
             } else {
-                // Короткий текст – показываем полностью, кнопку не показываем
                 shortDiv.textContent = fullText;
                 btn.style.display = 'none';
             }
         });
+
+        // Запуск инициализации на основе URL
+        initByUrl(); // при загрузке страницы проверяет URL на наличие параметра категории и загружает соответствующие предприятия
     });
 </script>
+
 {% endblock %}

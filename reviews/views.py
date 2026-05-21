@@ -5,6 +5,7 @@ from django.db.models import Count, Avg
 import json
 from .models import Review, Category, Enterprise
 from .forms import ReviewForm
+from django.http import JsonResponse
 
 def index(request):
     # Только одобренные отзывы, новые сверху
@@ -169,3 +170,20 @@ def map_view(request):
 
     context = {'enterprises': enterprises}
     return render(request, 'reviews/ya_map.html', context)
+
+def get_enterprises_by_category(request):
+    """Возвращает список предприятий для выбранной категории (AJAX)"""
+    category_id = request.GET.get('category_id')
+    if category_id and category_id.isdigit():
+        enterprises = Enterprise.objects.filter(category_id=int(category_id)).order_by('name')
+    else:
+        enterprises = Enterprise.objects.all().order_by('name')
+    data = [
+        {
+            'id': e.id,
+            'name': e.name,
+            'address': e.address or ''
+        }
+        for e in enterprises
+    ]
+    return JsonResponse(data, safe=False)
