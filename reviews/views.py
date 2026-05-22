@@ -158,17 +158,23 @@ def enterprise_detail(request, enterprise_id):
     return render(request, 'reviews/enterprise_detail.html', context)
 
 def map_view(request):
-    # Предприятия с координатами
-    enterprises = Enterprise.objects.exclude(latitude__isnull=True).exclude(longitude__isnull=True)
-
-    for enterprise in enterprises:
-        # Считаем только одобренные отзывы
-        reviews_qs = enterprise.reviews.filter(is_approved=True)
-        avg_rating = reviews_qs.aggregate(Avg('rating'))['rating__avg']
-        enterprise.avg_rating = round(avg_rating, 1) if avg_rating else 0
-        enterprise.reviews_count = reviews_qs.count()
-
-    context = {'enterprises': enterprises}
+    # Получаем все предприятия с координатами
+    enterprises_qs = Enterprise.objects.exclude(latitude__isnull=True).exclude(longitude__isnull=True)
+    # Для каждого предприятия считаем средний рейтинг по одобренным отзывам и количество таких отзывов, чтобы показать в балуне
+    enterprises_list = []
+    for e in enterprises_qs:
+        reviews = e.reviews.filter(is_approved=True)
+        avg = reviews.aggregate(Avg('rating'))['rating__avg'] or 0
+        enterprises_list.append({
+            'id': e.id,
+            'name': e.name,
+            'address': e.address or '',
+            'lat': e.latitude,
+            'lon': e.longitude,
+            'avg_rating': round(avg, 1),
+            'reviews_count': reviews.count()
+        })
+    context = {'enterprises_list': enterprises_list}
     return render(request, 'reviews/ya_map.html', context)
 
 def get_enterprises_by_category(request):

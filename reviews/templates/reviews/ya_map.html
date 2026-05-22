@@ -3,48 +3,33 @@
 
 {% block content %}
 <h1 class="mb-4">Карта предприятий Мариуполя (Яндекс)</h1>
-
 <div class="row">
     <div class="col-12">
         <div id="map" style="width: 100%; height: 600px;"></div>
     </div>
 </div>
 
+<!-- Безопасная передача данных о предприятиях -->
+{{ enterprises_list|json_script:"enterprises-data" }}
+
 <script src="https://api-maps.yandex.ru/2.1/?apikey=58da5124-e272-4dfd-b451-6ed82cf669fc&lang=ru_RU" type="text/javascript"></script>
 <script>
-    // Функция ymaps.ready дождётся загрузки API
     ymaps.ready(init);
-    
+
     function init() {
-        // 1. Создаём карту
         var myMap = new ymaps.Map("map", {
             center: [47.0951, 37.5413],
             zoom: 13,
             controls: ["zoomControl", "fullscreenControl"]
         });
-        
-        // 2. Получаем данные о предприятиях
-        // Используем |escapejs для каждого строкового поля, чтобы экранировать кавычки и спецсимволы
-        var enterprises = [
-            {% for enterprise in enterprises %}
-            {
-                id: {{ enterprise.id|default:"0" }},
-                name: "{{ enterprise.name|escapejs|default:"" }}",
-                address: "{{ enterprise.address|escapejs|default:"" }}",
-                lat: {% if enterprise.latitude %}{{ enterprise.latitude }}{% else %}null{% endif %},
-                lon: {% if enterprise.longitude %}{{ enterprise.longitude }}{% else %}null{% endif %},
-                avg_rating: {{ enterprise.avg_rating|default:"0" }},
-                reviews_count: {{ enterprise.reviews_count|default:"0" }}
-            }{% if not forloop.last %},{% endif %}
-            {% endfor %}
-        ];
-        
-        // 3. Фильтруем только те, у которых есть координаты
+
+        // Безопасное получение данных из тега json_script
+        var enterprises = JSON.parse(document.getElementById('enterprises-data').textContent);
+
         var valid = enterprises.filter(function(e) {
             return e.lat !== null && e.lon !== null;
         });
-        
-        // 4. Добавляем метки
+
         for (var i = 0; i < valid.length; i++) {
             var ent = valid[i];
             var placemark = new ymaps.Placemark([ent.lat, ent.lon], {
@@ -54,12 +39,11 @@
                 hintContent: ent.name
             }, {
                 preset: 'islands#blueStretchyIcon'
-                // можно задать цвет в зависимости от рейтинга: iconColor: ...
             });
             myMap.geoObjects.add(placemark);
         }
-        
-        // 5. Автоматически подогнать карту под все метки
+
+        // Автоматическое масштабирование под все метки
         if (valid.length > 0) {
             var points = [];
             for (var i = 0; i < valid.length; i++) {
@@ -72,8 +56,9 @@
         }
     }
 </script>
+
 <p class="text-muted small mt-2">
-    Для отображения карты используется сервис Яндекс.Карты. 
+    Для отображения карты используется сервис Яндекс.Карты.
     <a href="https://yandex.ru/legal/maps_termsofuse/" target="_blank">Условия использования</a>
 </p>
 {% endblock %}
