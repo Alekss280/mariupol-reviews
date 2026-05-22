@@ -85,11 +85,7 @@ DATABASES = {
         'PASSWORD': config('DB_PASSWORD'),   # raw-строка для спецсимволов
         'HOST': '789fa9519d3c550a74740d89.twc1.net',
         'PORT': '3306',
-        'OPTIONS': {
-            'ssl': {
-                'ca': os.path.expanduser('~/.cloud-certs/root.crt'),
-                'verify_cert': True,
-            },
+        'OPTIONS': {            
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
         },
     }
