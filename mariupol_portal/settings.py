@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from pathlib import Path
 from decouple import config
 import os
+import MySQLdb
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -28,7 +29,7 @@ DEBUG = config('DEBUG', default=False, cast=bool)
 
 ALLOWED_HOSTS = config('DJANGO_ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',')
 
-CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',')
+CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS').split(',') # Для деплоя убрать комент
 
 # Application definition
 
@@ -74,11 +75,23 @@ WSGI_APPLICATION = 'mariupol_portal.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
+# Важно: для подключения к удалённой БД нужно установить пакет mysqlclient (pip install mysqlclient)
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'Mariupol_reviews_DB',
+        'USER': config('DB_USER'),
+        'PASSWORD': config('DB_PASSWORD'),   # raw-строка для спецсимволов
+        'HOST': '789fa9519d3c550a74740d89.twc1.net',
+        'PORT': '3306',
+        'OPTIONS': {
+            'ssl': {
+                'ca': os.path.expanduser('~/.cloud-certs/root.crt'),
+                'verify_cert': True,
+            },
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+        },
     }
 }
 
