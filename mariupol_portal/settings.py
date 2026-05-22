@@ -29,7 +29,7 @@ DEBUG = config('DEBUG', default=False, cast=bool)
 
 ALLOWED_HOSTS = config('DJANGO_ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',')
 
-#CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS').split(',') # Для деплоя убрать комент
+CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS').split(',') # Для деплоя убрать комент
 
 # Application definition
 
@@ -85,11 +85,7 @@ DATABASES = {
         'PASSWORD': config('DB_PASSWORD'),   # raw-строка для спецсимволов
         'HOST': '789fa9519d3c550a74740d89.twc1.net',
         'PORT': '3306',
-        'OPTIONS': {                         # Дополнительные параметры для подключения к удалённой БД
-            'ssl': {
-                'ca': os.path.expanduser('~/.cloud-certs/root.crt'), # Путь к сертификату для SSL-соединения с БД
-                'verify_cert': True, # Включаем проверку сертификата для безопасности соединения
-            },
+        'OPTIONS': {            
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'", # Режим строгой проверки данных при вставке/обновлении, чтобы избежать проблем с некорректными данными
         },
     }
