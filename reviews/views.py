@@ -44,6 +44,15 @@ def index(request):
     return render(request, 'reviews/index.html', context)
 
 def add_review(request):
+    initial = {}
+    enterprise_id = request.GET.get('enterprise')
+    if enterprise_id and enterprise_id.isdigit():
+        try:
+            enterprise = Enterprise.objects.get(id=int(enterprise_id))
+            initial['enterprise'] = enterprise   # объект, а не ID
+        except Enterprise.DoesNotExist:
+            pass
+
     if request.method == 'POST':
         form = ReviewForm(request.POST)
         if form.is_valid():
@@ -52,7 +61,7 @@ def add_review(request):
             messages.success(request, 'Спасибо! Ваш отзыв отправлен на модерацию и появится после проверки.')
             return redirect('index')
     else:
-        form = ReviewForm()
+        form = ReviewForm(initial=initial)
     return render(request, 'reviews/add_review.html', {'form': form})
 
 def stats(request):

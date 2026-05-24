@@ -8,21 +8,21 @@
 <!-- Блок-приглашение к статистике -->
 <div class="row mb-4">
     <div class="col-md-12">
-        <div class="card bg-light border-primary">
+        <div class="card bg-light text-center border-primary">
             <div class="card-body d-flex justify-content-between align-items-center">
                 <div>
-                    <h5 class="card-title mb-1">Аналитика и статистика</h5>
+                    <h5 class="card-title mb-3">Аналитика и статистика</h5>
                     <p class="card-text text-muted">Посмотрите распределение оценок, тональность отзывов и рейтинги предприятий.</p>
                     <div id="reviews"></div> <!-- якорь для прокрутки к отзывам -->
                 </div>
-                <a href="{% url 'stats' %}" class="btn btn-primary">Перейти к статистике →</a>
+                <a href="{% url 'stats' %}" class="btn btn-primary">Перейти к статистике</a>
             </div>
         </div>
     </div>
 </div>
 
 <!-- Форма фильтрации отзывов -->
-<div class="card mb-4">
+<div class="card mb-4 border-primary">
     <div class="card-body">
         <form method="get" id="filterForm" action="{% url 'index' %}#reviews">
             <!-- Первая строка: категория, предприятие, кнопки действий -->
@@ -85,7 +85,7 @@
 <div class="row row-cards">
     {% for review in page_obj %}
     <div class="col-md-6 mb-3">
-        <div class="card h-100">
+        <div class="card h-100 border-primary">
             <div class="card-body">
                 <!-- Название предприятия – ссылка на страницу предприятия -->
                 <h5 class="card-title">
@@ -125,7 +125,24 @@
         </div>
     </div>
     {% empty %}
-    <div class="alert alert-info">Нет отзывов по выбранному фильтру.</div>
+    <div class="col-12">
+    <div class="card text-center border-primary shadow-sm bg-light">
+        <div class="card-body">
+            <i class="bi bi-chat-square-text display-1 text-muted"></i>
+            <h5 class="card-title mb-3">Нет отзывов</h5>
+            <p class="card-text text-muted mb-3">
+                По выбранному фильтру пока нет отзывов.<br>
+                Будьте первым, кто поделится своим мнением!
+            </p>
+            <div class="d-flex justify-content-center">
+              <a href="{% url 'add_review' %}{% if selected_enterprise %}?enterprise={{ selected_enterprise }}{% endif %}" 
+              class="btn btn-primary">
+              <i class="bi bi-plus-circle"></i> Оставить отзыв
+              </a>
+            </div>
+        </div>
+    </div>
+    </div>
     {% endfor %}
 </div>
 

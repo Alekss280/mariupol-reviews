@@ -23,10 +23,12 @@
                         <label for="id_enterprise" class="form-label">Предприятие</label>
                         <select name="enterprise" id="id_enterprise" class="form-select" size="8" required>
                             {% for enterprise in form.fields.enterprise.queryset %}
-                                <option value="{{ enterprise.id }}" data-search="{{ enterprise.name|lower }} {{ enterprise.address|lower }}">
-                                    {{ enterprise.name }}{% if enterprise.address %} ({{ enterprise.address }}){% endif %}
-                                </option>
-                            {% endfor %}
+                            <option value="{{ enterprise.id }}" 
+                                data-search="{{ enterprise.name|lower }} {{ enterprise.address|lower }}"
+                                {% if request.GET.enterprise|add:0 == enterprise.id %}selected{% endif %}>
+                                {{ enterprise.name }}{% if enterprise.address %} ({{ enterprise.address }}){% endif %}
+                            </option>
+                         {% endfor %}
                         </select>
                         <div id="noResultsMessage" class="text-danger mt-2" style="display: none;">Ничего не найдено</div>
                     </div>
