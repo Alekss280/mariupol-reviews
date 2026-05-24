@@ -152,6 +152,25 @@
             </div>
         </div>
     </div>
+    {% empty %}
+    <div class="col-12 mb-3">
+    <div class="card text-center shadow-sm bg-light">
+        <div class="card-body">
+            <i class="bi bi-chat-square-text display-1 text-muted"></i>
+            <h5 class="card-title mb-3">Нет отзывов</h5>
+            <p class="card-text text-muted mb-3">
+                По выбранному фильтру пока нет отзывов.<br>
+                Будьте первым, кто поделится своим мнением!
+            </p>
+            <div class="d-flex justify-content-center">
+              <a href="{% url 'add_review' %}?enterprise={{ enterprise.id }}" 
+              class="btn btn-primary">
+              <i class="bi bi-plus-circle"></i> Оставить отзыв
+              </a>
+            </div>
+        </div>
+    </div>
+    </div>
     {% endfor %}
 </div>
 
