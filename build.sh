@@ -1,16 +1,12 @@
 #!/bin/bash
 
-# Основной скрипт для сборки образа Docker. Устанавливает зависимости, загружает модель и выполняет миграции.
+# Основной скрипт для сборки образа. Устанавливает зависимости, загружает модель и выполняет миграции.
 
-# Устанавливаем последнюю версию pip
+# Устанавливаем зависимости из requirements.txt
 
-pip install --upgrade pip && \
+pip install --upgrade -r requirements.txt && \
 
-# Устанавливаем зависимости из файла requirements.txt
-
-pip install -r requirements.txt --noinput && \
-
-# Выполняем миграции и собираем статические файлы для Django
+# Выполняем миграции для Django
 
 python manage.py migrate --noinput && \
 
