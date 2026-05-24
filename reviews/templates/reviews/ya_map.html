@@ -23,12 +23,10 @@
             controls: ["zoomControl", "fullscreenControl"]
         });
 
-        // Безопасное получение данных из тега json_script
         var enterprises = JSON.parse(document.getElementById('enterprises-data').textContent);
+        var valid = enterprises.filter(function(e) { return e.lat !== null && e.lon !== null; });
 
-        var valid = enterprises.filter(function(e) {
-            return e.lat !== null && e.lon !== null;
-        });
+        var placemarks = []; // массив для хранения меток и их ID
 
         for (var i = 0; i < valid.length; i++) {
             var ent = valid[i];
@@ -41,14 +39,28 @@
                 preset: 'islands#blueStretchyIcon'
             });
             myMap.geoObjects.add(placemark);
+            placemarks.push({ id: ent.id, placemark: placemark });
         }
 
-        // Автоматическое масштабирование под все метки
-        if (valid.length > 0) {
-            var points = [];
-            for (var i = 0; i < valid.length; i++) {
-                points.push([valid[i].lat, valid[i].lon]);
+        // Обработка GET-параметра enterprise для центрирования и открытия баллуна
+        var urlParams = new URLSearchParams(window.location.search);
+        var targetId = urlParams.get('enterprise');
+        if (targetId) {
+            var target = valid.find(function(e) { return e.id == targetId; });
+            if (target) {
+                myMap.setCenter([target.lat, target.lon], 17, { duration: 500 });
+                setTimeout(function() {
+                    var targetPlacemark = placemarks.find(function(pm) { return pm.id == targetId; });
+                    if (targetPlacemark) {
+                        targetPlacemark.placemark.balloon.open();
+                    }
+                }, 500);
             }
+        }
+
+        // Масштабирование под все метки, если не было центрирования на конкретном предприятии
+        if (!targetId && valid.length > 0) {
+            var points = valid.map(function(p) { return [p.lat, p.lon]; });
             var bounds = ymaps.geoQuery(points).getBounds();
             if (bounds) {
                 myMap.setBounds(bounds, { checkZoomRange: true, zoomMargin: 50 });

@@ -12,6 +12,13 @@
         {% if enterprise.address %}
             <p class="card-text">Адрес: {{ enterprise.address }}</p>
         {% endif %}
+        {% if enterprise.latitude and enterprise.longitude %}
+         <div>
+            <a href="{% url 'ya_map' %}?enterprise={{ enterprise.id }}" class="btn btn-primary">
+            <i class="bi bi-map"></i> Посмотреть на карте
+            </a>
+         </div>
+           {% endif %}
         <div class="row mt-3">
             <div class="col-md-6">
                 <div class="bg-light p-3 rounded text-center">
