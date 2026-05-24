@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Отзывы о предприятиях Мариуполя</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
     /* ========== ПЕРЕМЕННЫЕ СВЕТЛОЙ ТЕМЫ (по умолчанию) ========== */
     :root {
@@ -153,12 +154,44 @@ select#id_enterprise option {
     border-bottom: 1px solid #eee;
 }
 
+.fab {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        background-color: #0d6efd;
+        color: white;
+        text-align: center;
+        line-height: 56px;
+        font-size: 24px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        transition: all 0.2s;
+        z-index: 1000;
+        text-decoration: none;
+    }
+    .fab:hover {
+        background-color: #0b5ed7;
+        color: white;
+        transform: scale(1.05);
+        box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+    }
+
 /* На мобильных устройствах чуть мельче и компактнее */
 @media (max-width: 768px) {
     select#id_enterprise option {
         padding: 6px 10px;
         font-size: 14px;
     }
+    .fab {
+            width: 48px;
+            height: 48px;
+            line-height: 48px;
+            font-size: 20px;
+            bottom: 1rem;
+            right: 1rem;
+        }
 }
     </style>
 </head>
@@ -228,6 +261,12 @@ select#id_enterprise option {
         this.textContent = isDark ? '🌙 Тёмная тема' : '☀️ Светлая тема';
     });
 </script>
+
+{% if not hide_fab %}
+    <a href="{{ fab_url }}" class="fab" id="fab">
+        <i class="bi bi-plus-lg"></i>
+    </a>
+{% endif %}
 
 </body>
 </html>

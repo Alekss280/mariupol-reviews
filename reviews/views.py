@@ -33,6 +33,9 @@ def index(request):
         for e in enterprises
     ]
 
+    # Ссылка для плавающей кнопки на главной
+    fab_url = f"/add/?enterprise={enterprise_id}" if enterprise_id else "/add/"
+
     context = {
         'page_obj': page_obj,
         'categories': categories,
@@ -40,6 +43,7 @@ def index(request):
         'enterprises_list': enterprises_list,
         'selected_category': int(category_id) if category_id else None,
         'selected_enterprise': int(enterprise_id) if enterprise_id else None,
+        'fab_url': fab_url,
     }
     return render(request, 'reviews/index.html', context)
 
@@ -62,7 +66,12 @@ def add_review(request):
             return redirect('index')
     else:
         form = ReviewForm(initial=initial)
-    return render(request, 'reviews/add_review.html', {'form': form})
+
+    context = {
+        'form': form,
+        'hide_fab': True,  # скрываем плавающую кнопку на странице добавления отзыва
+    }
+    return render(request, 'reviews/add_review.html', context)
 
 def stats(request):
     # Работаем только с одобренными отзывами
@@ -106,6 +115,7 @@ def stats(request):
         'sentiment_data': json.dumps(sentiment_data),
         'top_enterprises': top_enterprises,
         'current_sort': sort_by,   # для подсветки активной кнопки в шаблоне
+        'fab_url': "/add/",        # плавающая кнопка ведёт на форму добавления
     }
     return render(request, 'reviews/stats.html', context)
 
@@ -154,6 +164,9 @@ def enterprise_detail(request, enterprise_id):
         count = all_reviews.filter(sentiment=s).count()
         sentiment_data.append({'sentiment': s, 'count': count})
     
+    # Ссылка для плавающей кнопки – с параметром текущего предприятия
+    fab_url = f"/add/?enterprise={enterprise_id}"
+    
     context = {
         'enterprise': enterprise,
         'page_obj': page_obj,
@@ -163,6 +176,7 @@ def enterprise_detail(request, enterprise_id):
         'sentiment_data': json.dumps(sentiment_data),
         'current_sentiment': sentiment_filter,
         'current_rating': rating_filter,
+        'fab_url': fab_url,
     }
     return render(request, 'reviews/enterprise_detail.html', context)
 
@@ -183,7 +197,13 @@ def map_view(request):
             'avg_rating': round(avg, 1),
             'reviews_count': reviews.count()
         })
-    context = {'enterprises_list': enterprises_list}
+        
+    enterprise_id = request.GET.get('enterprise')
+    fab_url = f"/add/?enterprise={enterprise_id}" if enterprise_id else "/add/"
+    context = {
+        'enterprises_list': enterprises_list,
+        'fab_url': fab_url,
+    }
     return render(request, 'reviews/ya_map.html', context)
 
 def get_enterprises_by_category(request):
