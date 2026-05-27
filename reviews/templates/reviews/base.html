@@ -4,220 +4,225 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Отзывы о предприятиях Мариуполя</title>
+
+    <!-- Применяем тему мгновенно до загрузки стилей -->
+    <script>
+        (function() {
+            const theme = localStorage.getItem('theme');
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark-theme');
+            } else if (theme === 'light') {
+                document.documentElement.classList.remove('dark-theme');
+            } else {
+                // Проверяем системные настройки (опционально)
+                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    document.documentElement.classList.add('dark-theme');
+                }
+            }
+        })();
+    </script>
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
     <style>
-    /* ========== ПЕРЕМЕННЫЕ СВЕТЛОЙ ТЕМЫ (по умолчанию) ========== */
-    :root {
-        --bg-body: #f8f9fa;
-        --bg-card: #cccccc;
-        --text-primary: #000000;
-        --text-secondary: #2a2c2e;
-        --border-color: #dee2e6;
-        --navbar-bg: #212529;
-        --footer-bg: #212529;
-        --footer-text: #eaeef2;
-        --link-color: #0d6efd;
-    }
+        /* ========== ПЕРЕМЕННЫЕ СВЕТЛОЙ ТЕМЫ (по умолчанию) ========== */
+        :root {
+            --bg-body: #f8f9fa;
+            --bg-card: #cccccc;
+            --text-primary: #000000;
+            --text-secondary: #2a2c2e;
+            --border-color: #dee2e6;
+            --navbar-bg: #212529;
+            --footer-bg: #212529;
+            --footer-text: #eaeef2;
+            --link-color: #0d6efd;
+        }
 
-    /* ========== ТЁМНАЯ ТЕМА ========== */
-    body.dark-theme {
-        --bg-body: #1b1b23;
-        --bg-card: #171b27;
-        --text-primary: #eaeef2;
-        --text-secondary: #a0aec0;
-        --border-color: #2d3748;
-        --navbar-bg: #142539;
-        --footer-bg: #162538;
-        --footer-text: #eaeef2;
-        --link-color: #3b82f6;
-    }
+        /* ========== ТЁМНАЯ ТЕМА (на уровне html) ========== */
+        html.dark-theme {
+            --bg-body: #1b1b23;
+            --bg-card: #171b27;
+            --text-primary: #eaeef2;
+            --text-secondary: #a0aec0;
+            --border-color: #2d3748;
+            --navbar-bg: #142539;
+            --footer-bg: #162538;
+            --footer-text: #eaeef2;
+            --link-color: #3b82f6;
+        }
 
-    /* ========== ПРИМЕНЕНИЕ ПЕРЕМЕННЫХ ========== */
-    body {
-        background-color: var(--bg-body);
-        color: var(--text-primary);
-        transition: background-color 0.3s, color 0.3s;
-        padding-top: 0px;
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-    }
+        /* ========== ПРИМЕНЕНИЕ ПЕРЕМЕННЫХ ========== */
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+            transition: background-color 0.3s, color 0.3s;
+            padding-top: 0px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
 
-    /* Карточки */
-    .card {
-        background-color: var(--bg-card);
-        border-color: var(--border-color);
-        color: var(--text-primary);
-    }
-    .card-body {
-        background-color: var(--bg-card);
-    }
+        /* Карточки */
+        .card {
+            background-color: var(--bg-card);
+            border-color: var(--border-color);
+            color: var(--text-primary);
+        }
+        .card-body {
+            background-color: var(--bg-card);
+        }
 
-    /* Текст muted */
-    .text-muted {
-        color: var(--text-secondary) !important;
-    }
+        /* Текст muted */
+        .text-muted {
+            color: var(--text-secondary) !important;
+        }
 
-    /* Футер */
-    footer {
-        margin-top: auto;
-        text-align: center;
-        padding: 20px;
-        background-color: var(--footer-bg);
-        color: var(--footer-text);
-    }
+        /* Футер */
+        footer {
+            margin-top: auto;
+            text-align: center;
+            padding: 20px;
+            background-color: var(--footer-bg);
+            color: var(--footer-text);
+        }
 
-    /* Навигация */
-    .navbar-dark {
-        background-color: var(--navbar-bg) !important;
-    }
+        /* Навигация */
+        .navbar-dark {
+            background-color: var(--navbar-bg) !important;
+        }
 
-    /* Ссылки */
-    a {
-        color: var(--link-color);
-    }
-    a:hover {
-        filter: brightness(0.9);
-    }
+        /* Ссылки */
+        a {
+            color: var(--link-color);
+        }
+        a:hover {
+            filter: brightness(0.9);
+        }
 
-    /* Ваши кастомные классы */
-    .rating-stars {
-        color: #ffc107;
-    }
-    .pre-line {
-        white-space: pre-line;
-    }
+        /* Ваши кастомные классы */
+        .rating-stars {
+            color: #ffc107;
+        }
+        .pre-line {
+            white-space: pre-line;
+        }
 
-    /* Карточки одинаковой высоты */
-    .row-cards {
-        display: flex;
-        flex-wrap: wrap;
-    }
-    .card {
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-    }
-    .card-body {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-    }
-    .review-wrapper {
-        flex-grow: 1;
-    }
+        /* Карточки одинаковой высоты */
+        .row-cards {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .card {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        .card-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .review-wrapper {
+            flex-grow: 1;
+        }
 
-    /* Таблицы и дополнительные элементы */
-    .table {
-        color: var(--text-primary);
-    }
-    .table-striped > tbody > tr:nth-of-type(odd) > * {
-        background-color: rgba(255, 255, 255, 0.05);
-    }
-    .bg-light {
-        background-color: var(--bg-card) !important;
-    }
-    .border-primary {
-        border-color: #0d6efd !important;
-    }
-    .btn-outline-light {
-        border-color: var(--navbar-text);
-        color: var(--navbar-text);
-    }
-    .btn-outline-light:hover {
-        background-color: rgba(255,255,255,0.1);
-    }
+        /* Таблицы и дополнительные элементы */
+        .table {
+            color: var(--text-primary);
+        }
+        .table-striped > tbody > tr:nth-of-type(odd) > * {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        .bg-light {
+            background-color: var(--bg-card) !important;
+        }
+        .border-primary {
+            border-color: #0d6efd !important;
+        }
+        .btn-outline-light {
+            border-color: var(--navbar-text);
+            color: var(--navbar-text);
+        }
+        .btn-outline-light:hover {
+            background-color: rgba(255,255,255,0.1);
+        }
 
-    /* Минималистичный переключатель темы */
-    #theme-toggle {
-        border: none;
-        background: transparent;
-        font-size: 1.3rem;
-        padding: 0 0.5rem;
-        color: #a3a3a3;
-        transition: color 0.2s;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    #theme-toggle:hover {
-        color: #ffffff;
-    }
+        /* Минималистичный переключатель темы */
+        #theme-toggle {
+            border: none;
+            background: transparent;
+            font-size: 1.3rem;
+            padding: 0 0.5rem;
+            color: #a3a3a3;
+            transition: color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #theme-toggle:hover {
+            color: #ffffff;
+        }
 
-    .text-inherit {
-        color: inherit;
-    }
+        .text-inherit {
+            color: inherit;
+        }
 
-    /* Улучшение отображения выпадающего списка предприятий */
-    select#id_enterprise {
-        width: 100%;
-        max-width: 100%;
-    }
-    select#id_enterprise option {
-        white-space: normal;
-        word-break: break-word;
-        padding: 8px 12px;
-        border-bottom: 1px solid #eee;
-    }
-
-    /* Плавающая кнопка (+) */
-    .fab {
-        position: fixed;
-        bottom: 2rem;
-        right: 2rem;
-        width: 56px;
-        height: 56px;
-        border-radius: 50%;
-        background-color: #0d6efd;
-        color: white;
-        text-align: center;
-        line-height: 56px;
-        font-size: 24px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-        transition: all 0.2s;
-        z-index: 1000;
-        text-decoration: none;
-    }
-    .fab:hover {
-        background-color: #0b5ed7;
-        color: white;
-        transform: scale(1.05);
-        box-shadow: 0 6px 16px rgba(0,0,0,0.3);
-    }
-
-    /* Адаптив для мобильных */
-    @media (max-width: 768px) {
+        /* Улучшение отображения выпадающего списка предприятий */
+        select#id_enterprise {
+            width: 100%;
+            max-width: 100%;
+        }
         select#id_enterprise option {
-            padding: 6px 10px;
-            font-size: 14px;
+            white-space: normal;
+            word-break: break-word;
+            padding: 8px 12px;
+            border-bottom: 1px solid #eee;
         }
+
+        /* Плавающая кнопка (+) */
         .fab {
-            width: 48px;
-            height: 48px;
-            line-height: 48px;
-            font-size: 20px;
-            bottom: 1rem;
-            right: 1rem;
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background-color: #0d6efd;
+            color: white;
+            text-align: center;
+            line-height: 56px;
+            font-size: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            transition: all 0.2s;
+            z-index: 1000;
+            text-decoration: none;
         }
-    }
+        .fab:hover {
+            background-color: #0b5ed7;
+            color: white;
+            transform: scale(1.05);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+        }
+
+        /* Адаптив для мобильных */
+        @media (max-width: 768px) {
+            select#id_enterprise option {
+                padding: 6px 10px;
+                font-size: 14px;
+            }
+            .fab {
+                width: 48px;
+                height: 48px;
+                line-height: 48px;
+                font-size: 20px;
+                bottom: 1rem;
+                right: 1rem;
+            }
+        }
     </style>
 </head>
 <body>
-<!-- Мгновенное применение темы (без моргания) -->
-<script>
-    (function() {
-        const theme = localStorage.getItem('theme');
-        if (theme === 'dark') {
-            document.body.classList.add('dark-theme');
-        } else if (theme === 'light') {
-            document.body.classList.remove('dark-theme');
-        } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-            document.body.classList.add('dark-theme');
-        }
-    })();
-</script>
-
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
         <div class="container">
             <a class="navbar-brand" href="{% url 'index' %}">Отзывы Мариуполя</a>
@@ -271,19 +276,19 @@
         const themeIcon = themeToggleBtn.querySelector('i');
 
         function updateThemeIcon() {
-            if (document.body.classList.contains('dark-theme')) {
+            if (document.documentElement.classList.contains('dark-theme')) {
                 themeIcon.className = 'bi bi-sun';
             } else {
                 themeIcon.className = 'bi bi-moon';
             }
         }
 
-        // Иконка обновляется в соответствии с уже применённой темой
+        // Инициализируем иконку
         updateThemeIcon();
 
         themeToggleBtn.addEventListener('click', function() {
-            document.body.classList.toggle('dark-theme');
-            const isDark = document.body.classList.contains('dark-theme');
+            document.documentElement.classList.toggle('dark-theme');
+            const isDark = document.documentElement.classList.contains('dark-theme');
             localStorage.setItem('theme', isDark ? 'dark' : 'light');
             updateThemeIcon();
         });
