@@ -39,9 +39,9 @@
         color: var(--text-primary);
         transition: background-color 0.3s, color 0.3s;
         padding-top: 0px;
-        min-height: 100vh; /* футер всегда внизу */
-        display: flex; /* футер всегда внизу */
-        flex-direction: column; /* футер всегда внизу */
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
     }
 
     /* Карточки */
@@ -61,14 +61,14 @@
 
     /* Футер */
     footer {
-        margin-top: auto; /* футер всегда внизу */
+        margin-top: auto;
         text-align: center;
         padding: 20px;
         background-color: var(--footer-bg);
         color: var(--footer-text);
     }
 
-    /* Навигация (Bootstrap .navbar-dark переопределяется через important) */
+    /* Навигация */
     .navbar-dark {
         background-color: var(--navbar-bg) !important;
     }
@@ -129,32 +129,40 @@
         background-color: rgba(255,255,255,0.1);
     }
 
-    /* Стиль кнопки "Тёмная тема" */
+    /* Минималистичный переключатель темы */
     #theme-toggle {
-        border: none !important;
-        color: #a3a3a3 !important;
+        border: none;
+        background: transparent;
+        font-size: 1.3rem;
+        padding: 0 0.5rem;
+        color: #a3a3a3;
+        transition: color 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
     #theme-toggle:hover {
-        color: #ffffff !important;
+        color: #ffffff;
     }
+
     .text-inherit {
-    color: inherit;
-}
+        color: inherit;
+    }
 
-/* Улучшение отображения выпадающего списка предприятий */
-select#id_enterprise {
-    width: 100%;
-    max-width: 100%;
-}
+    /* Улучшение отображения выпадающего списка предприятий */
+    select#id_enterprise {
+        width: 100%;
+        max-width: 100%;
+    }
+    select#id_enterprise option {
+        white-space: normal;
+        word-break: break-word;
+        padding: 8px 12px;
+        border-bottom: 1px solid #eee;
+    }
 
-select#id_enterprise option {
-    white-space: normal;       /* разрешить перенос строк */
-    word-break: break-word;    /* перенос длинных слов */
-    padding: 8px 12px;         /* удобные отступы для тапа */
-    border-bottom: 1px solid #eee;
-}
-
-.fab {
+    /* Плавающая кнопка (+) */
+    .fab {
         position: fixed;
         bottom: 2rem;
         right: 2rem;
@@ -178,13 +186,13 @@ select#id_enterprise option {
         box-shadow: 0 6px 16px rgba(0,0,0,0.3);
     }
 
-/* На мобильных устройствах чуть мельче и компактнее */
-@media (max-width: 768px) {
-    select#id_enterprise option {
-        padding: 6px 10px;
-        font-size: 14px;
-    }
-    .fab {
+    /* Адаптив для мобильных */
+    @media (max-width: 768px) {
+        select#id_enterprise option {
+            padding: 6px 10px;
+            font-size: 14px;
+        }
+        .fab {
             width: 48px;
             height: 48px;
             line-height: 48px;
@@ -192,33 +200,50 @@ select#id_enterprise option {
             bottom: 1rem;
             right: 1rem;
         }
-}
+    }
     </style>
 </head>
 <body>
+<!-- Мгновенное применение темы (без моргания) -->
+<script>
+    (function() {
+        const theme = localStorage.getItem('theme');
+        if (theme === 'dark') {
+            document.body.classList.add('dark-theme');
+        } else if (theme === 'light') {
+            document.body.classList.remove('dark-theme');
+        } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.body.classList.add('dark-theme');
+        }
+    })();
+</script>
+
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
-    <div class="container">
-        <a class="navbar-brand" href="{% url 'index' %}">Отзывы Мариуполя</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Переключить навигацию">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'stats' %}">Статистика</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'ya_map' %}">Карта</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'add_review' %}">Оставить отзыв</a>                
-                <li class="nav-item">
-                    <button id="theme-toggle" class="btn btn-outline-secondary ms-2 mt-2 mt-lg-0">🌙 Тёмная тема</button>
-                </li>
-            </ul>
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'index' %}">Отзывы Мариуполя</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Переключить навигацию">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'stats' %}">Статистика</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'ya_map' %}">Карта</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'add_review' %}">Оставить отзыв</a>
+                    </li>
+                    <li class="nav-item">
+                        <button id="theme-toggle" class="btn btn-link nav-link">
+                            <i class="bi bi-moon"></i>
+                        </button>
+                    </li>
+                </ul>
+            </div>
         </div>
-    </div>
-</nav>
+    </nav>
 
     {% if messages %}
     <div class="container mt-3">
@@ -229,7 +254,7 @@ select#id_enterprise option {
             </div>
         {% endfor %}
     </div>
-{% endif %}
+    {% endif %}
 
     <div class="container mt-4">
         {% block content %}
@@ -241,32 +266,33 @@ select#id_enterprise option {
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const themeIcon = themeToggleBtn.querySelector('i');
 
-<script>
-    // Проверяем сохранённую тему в localStorage
-    const currentTheme = localStorage.getItem('theme');
-    if (currentTheme === 'dark') {
-        document.body.classList.add('dark-theme');
-        document.getElementById('theme-toggle').textContent = '🌙 Тёмная тема';
-    } else {
-        document.body.classList.remove('dark-theme');
-        document.getElementById('theme-toggle').textContent = '☀️ Светлая тема';
-    }
+        function updateThemeIcon() {
+            if (document.body.classList.contains('dark-theme')) {
+                themeIcon.className = 'bi bi-sun';
+            } else {
+                themeIcon.className = 'bi bi-moon';
+            }
+        }
 
-    // Обработчик кнопки
-    document.getElementById('theme-toggle').addEventListener('click', function() {
-        document.body.classList.toggle('dark-theme');
-        const isDark = document.body.classList.contains('dark-theme');
-        localStorage.setItem('theme', isDark ? 'dark' : 'light');
-        this.textContent = isDark ? '🌙 Тёмная тема' : '☀️ Светлая тема';
-    });
-</script>
+        // Иконка обновляется в соответствии с уже применённой темой
+        updateThemeIcon();
 
-{% if not hide_fab %}
-    <a href="{{ fab_url }}" class="fab" id="fab">
-        <i class="bi bi-plus-lg"></i>
-    </a>
-{% endif %}
+        themeToggleBtn.addEventListener('click', function() {
+            document.body.classList.toggle('dark-theme');
+            const isDark = document.body.classList.contains('dark-theme');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            updateThemeIcon();
+        });
+    </script>
 
+    {% if not hide_fab %}
+        <a href="{{ fab_url }}" class="fab" id="fab">
+            <i class="bi bi-plus-lg"></i>
+        </a>
+    {% endif %}
 </body>
 </html>
