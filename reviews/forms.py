@@ -1,7 +1,20 @@
 from django import forms
 from .models import Review, Enterprise
+from simplemathcaptcha.fields import MathCaptchaField
+from simplemathcaptcha.widgets import MathCaptchaWidget
 
 class ReviewForm(forms.ModelForm):
+    # Параметры капчи передаём в виджет
+    captcha = MathCaptchaField(
+        widget=MathCaptchaWidget(
+            question_tmpl="Решите пример: %(num1)i %(operator)s %(num2)i = ?",
+        ),
+        error_messages={
+            'invalid': 'Пожалуйста, решите пример правильно.',
+            'invalid_number': 'Пожалуйста, введите целое число.'
+        }
+    )
+
     class Meta:
         model = Review
         fields = ['enterprise', 'text', 'rating']

@@ -50,6 +50,25 @@
                             <option value="1">1 звезда</option>
                         </select>
                     </div>
+                       <!-- Капча (новое поле) -->
+                    <div class="mb-3">
+                     <label for="{{ form.captcha.id_for_label }}" class="form-label">
+                      <i class="bi bi-shield-lock"></i> Защита от спама
+                     </label>
+                    <div class="d-flex flex-column flex-sm-row align-items-start gap-2">
+                      <div class="math-captcha">
+                        {{ form.captcha }}
+                      </div>
+                    </div>
+                    {% if form.captcha.errors %}
+                    <div class="text-danger small mt-1">
+                     {% for error in form.captcha.errors %}
+                     {{ error }}<br>
+                     {% endfor %}
+                    </div>
+                    {% endif %}
+                    <small class="text-muted">Пожалуйста, решите простой пример правильно, чтобы подтвердить, что вы не робот.</small>
+                   </div>
 
                     <div class="d-flex justify-content-center mt-3">
                       <button type="submit" class="btn btn-primary">
@@ -84,6 +103,6 @@
         noResults.style.display = hasVisible ? 'none' : 'block';
     }
 
-    searchInput.addEventListener('input', filterEnterprises);
+    searchInput.addEventListener('input', filterEnterprises);    
 </script>
 {% endblock %}
