@@ -78,6 +78,7 @@ WSGI_APPLICATION = 'mariupol_portal.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 # Важно: для подключения к удалённой БД нужно установить пакет mysqlclient (pip install mysqlclient)
 
+# Конфигурация подключения к удалённой MySQL базе данных
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -86,8 +87,9 @@ DATABASES = {
         'PASSWORD': config('DB_PASSWORD'),   # raw-строка для спецсимволов
         'HOST': '789fa9519d3c550a74740d89.twc1.net',
         'PORT': '3306',
-        'OPTIONS': {            
-            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'", # Режим строгой проверки данных при вставке/обновлении, чтобы избежать проблем с некорректными данными
+        'OPTIONS': {  
+            'charset': 'utf8mb4',  # Кодировка utf8mb4 для поддержки всех символов Unicode, включая эмодзи          
+            'init_command': "SET NAMES utf8mb4", # Инициализационная команда для установки кодировки при каждом подключении
         },
     }
 }
