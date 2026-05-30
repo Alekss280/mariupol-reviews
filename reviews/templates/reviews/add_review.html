@@ -152,18 +152,20 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // --- Автоматическая прокрутка к текстовому полю, если предприятие предвыбрано ---
-const urlParams = new URLSearchParams(window.location.search);
-const enterpriseParam = urlParams.get('enterprise');
-if (enterpriseParam && enterpriseParam.trim() !== '') {
-    const textField = document.getElementById('id_text');
-    if (textField) {
-        // Небольшая задержка, чтобы DOM полностью загрузился и все элементы отрисовались
+    // --- Автоматическая прокрутка к текстовому полю, если предприятие предвыбрано и нет ошибки капчи ---
+    const urlParams = new URLSearchParams(window.location.search);
+    const enterpriseParam = urlParams.get('enterprise');
+    // Проверяем, есть ли ошибка капчи
+    const hasCaptchaError = document.getElementById('captcha-errors') && 
+     document.getElementById('captcha-errors').children.length > 0;
+     if (enterpriseParam && enterpriseParam.trim() !== '' && !hasCaptchaError) {
+      const textField = document.getElementById('id_text');
+     if (textField) {
         setTimeout(() => {
             textField.scrollIntoView({ behavior: 'smooth', block: 'center' });
             textField.focus();
         }, 300);
-    }
+        }
 }
 
 // Инициализация Bootstrap Tooltips
