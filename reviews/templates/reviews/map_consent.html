@@ -1,0 +1,91 @@
+{% extends 'reviews/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h3 class="mb-0">Внимание: передача данных при использовании карты</h3>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    <strong>Важно для анонимности:</strong> При загрузке Яндекс.Карт ваш браузер передаёт определённую техническую информацию.
+                </div>
+
+                <h5><i class="bi bi-shield-lock"></i> Какие данные передаются?</h5>
+                <ul>
+                    <li><strong>IP-адрес</strong> – для определения вашего региона и обеспечения работы карты.</li>
+                    <li><strong>Данные о браузере и устройстве</strong> (тип браузера, версия ОС, разрешение экрана).</li>
+                    <li><strong>Cookies и веб-маяки</strong> – для сбора технической информации о вашем взаимодействии с картой.</li>
+                    <li><strong>Технические данные HTTP-запросов</strong> (заголовки, информация о сети).</li>
+                </ul>
+
+                <h5><i class="bi bi-file-text"></i> Правовая информация</h5>
+                <p>Яндекс обрабатывает передаваемые данные в соответствии со своей политикой конфиденциальности. Ознакомтесь с документами:</p>
+                <ul>
+                    <li><a href="https://yandex.ru/legal/confidential/" target="_blank" rel="noopener noreferrer">Политика конфиденциальности Яндекса</a></li>
+                    <li><a href="https://yandex.ru/legal/maps_termsofuse/" target="_blank" rel="noopener noreferrer">Условия использования сервиса Яндекс.Карты</a></li>
+                    <li><a href="https://yandex.ru/legal/maps_api/" target="_blank" rel="noopener noreferrer">Пользовательское соглашение API Яндекс.Карт</a></li>
+                </ul>
+
+                <!-- Панель согласия, появляется через несколько секунд -->
+                <div id="consent-panel" style="display: none;">
+                    <div class="alert alert-info mt-3">
+                        <i class="bi bi-info-circle"></i> Вы можете продолжить переход к карте. Принимая и осознавая, что Яндекс обрабатывает передаваемые данные в соответствии со своей политикой конфиденциальности.
+                    </div>
+
+                    <div class="form-check mb-3">
+                        <input type="checkbox" class="form-check-input" id="consentCheckbox">
+                        <label class="form-check-label" for="consentCheckbox">
+                            Я ознакомлен(а) с условиями использования сервиса Яндекс.Карт, политикой конфиденциальности и согласен(а) на передачу моих технических данных (IP-адрес, данные браузера, cookies и т.д.) в соответствии с указаной документацией.
+                        </label>
+                    </div>
+
+                    <form method="post" id="consentForm" action="{% url 'confirm_map_consent' %}?next={{ request.GET.next|default:''|urlencode }}">
+                        {% csrf_token %}
+                        <input type="hidden" name="next" value="{{ request.GET.next }}">
+                        <div class="d-flex gap-3">
+                            <button type="submit" class="btn btn-primary" id="submitConsent" disabled>
+                                <i></i> Перейти к карте
+                            </button>
+                            <button type="button" onclick="window.history.back();" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left"></i> Вернуться назад
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Появление панели через 5 секунд
+    setTimeout(function() {
+        document.getElementById('consent-panel').style.display = 'block';
+    }, 5000);
+
+    // Управление активностью кнопки в зависимости от чекбокса
+    const checkbox = document.getElementById('consentCheckbox');
+    const submitBtn = document.getElementById('submitConsent');
+
+    checkbox.addEventListener('change', function() {
+        if (checkbox.checked) {
+            submitBtn.disabled = false;
+            submitBtn.style.opacity = '1';
+            submitBtn.style.pointerEvents = 'auto';
+        } else {
+            submitBtn.disabled = true;
+            submitBtn.style.opacity = '0.6';
+            submitBtn.style.pointerEvents = 'none';
+        }
+    });
+
+    // Изначальное состояние кнопки (неактивна)
+    submitBtn.disabled = true;
+    submitBtn.style.opacity = '0.6';
+    submitBtn.style.pointerEvents = 'none';
+</script>
+{% endblock %}

@@ -31,6 +31,23 @@ ALLOWED_HOSTS = config('DJANGO_ALLOWED_HOSTS', default='localhost,127.0.0.1').sp
 
 CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS').split(',') # Для деплоя убрать комент
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': True,
+}
+
+# Сессия живёт 1 час (3600 секунд) с момента последнего запроса
+SESSION_COOKIE_AGE = 3600
+
+# Сессия удаляется при закрытии браузера (если True, то SESSION_COOKIE_AGE игнорируется)
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True   # оставляем как есть, чтобы работал возраст
+
+# Безопасность: cookie доступна только по HTTPS (для продакшена)
+SESSION_COOKIE_SECURE = True   # включите при использовании HTTPS
+
+# Защита от JavaScript-кражи cookie
+SESSION_COOKIE_HTTPONLY = True
+
 # Application definition
 
 INSTALLED_APPS = [

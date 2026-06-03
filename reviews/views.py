@@ -6,6 +6,9 @@ import json
 from .models import Review, Category, Enterprise
 from .forms import ReviewForm
 from django.http import JsonResponse
+from urllib.parse import quote
+from django.shortcuts import redirect
+from django.urls import reverse
 
 def index(request):
     # Только одобренные отзывы, новые сверху
@@ -91,7 +94,7 @@ def stats(request):
         count = approved_reviews.filter(sentiment=s).count()
         sentiment_data.append({'sentiment': s, 'count': count})
 
-    # ========== НОВАЯ ЧАСТЬ: сортировка топ-10 ==========
+    # ========== Сортировка топ-10 ==========
     sort_by = request.GET.get('sort', 'count')   # параметр из URL, по умолчанию 'count'
 
     top_queryset = approved_reviews.values(
@@ -180,7 +183,30 @@ def enterprise_detail(request, enterprise_id):
     }
     return render(request, 'reviews/enterprise_detail.html', context)
 
+def map_consent(request):
+    """
+    Промежуточная страница перед Яндекс.Картой с уведомлением о передаче персональных данных.
+    После задержки (5 секунд) появляется кнопка для перехода к карте.
+    """
+    return render(request, 'reviews/map_consent.html')
+
+def confirm_map_consent(request):
+    if request.method != 'POST':
+        return redirect('map_consent')
+    request.session['map_consent_granted'] = True
+    request.session.save()
+    next_url = request.GET.get('next')
+    if not next_url:
+        next_url = reverse('ya_map')
+    return redirect(next_url)
+
 def map_view(request):
+    # Проверяем, дал ли пользователь согласие
+    if not request.session.get('map_consent_granted'):
+        # Запоминаем текущий URL (с параметрами)
+        next_url = request.get_full_path()
+        consent_url = reverse('map_consent')
+        return redirect(f"{consent_url}?next={quote(next_url)}")
     # Получаем все предприятия с координатами
     enterprises_qs = Enterprise.objects.exclude(latitude__isnull=True).exclude(longitude__isnull=True)
     # Для каждого предприятия считаем средний рейтинг по одобренным отзывам и количество таких отзывов, чтобы показать в балуне
