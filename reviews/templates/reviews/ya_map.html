@@ -18,10 +18,13 @@
 
     function init() {
         var myMap = new ymaps.Map("map", {
-            center: [47.0951, 37.5413],
-            zoom: 13,
-            controls: ["zoomControl", "fullscreenControl"]
-        });
+        center: [47.0951, 37.5413],
+        zoom: 13,
+        controls: ["zoomControl", "fullscreenControl"]
+    }, {
+        maxZoom: 15,   // максимальный уровень зума
+        minZoom: 13    // минимальный 
+    });
 
         var enterprises = JSON.parse(document.getElementById('enterprises-data').textContent);
         var valid = enterprises.filter(function(e) { return e.lat !== null && e.lon !== null; });
