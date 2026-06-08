@@ -29,8 +29,10 @@ DEBUG = config('DEBUG', default=False, cast=bool)
 
 ALLOWED_HOSTS = config('DJANGO_ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',')
 
+# Для деплоя нужно указать домены в CSRF_TRUSTED_ORIGINS, например: https://yourdomain.com,https://www.yourdomain.com
 CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS').split(',') # Для деплоя убрать комент
 
+# Логирование отключено, чтобы не создавать лишних файлов в продакшене
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': True,
@@ -50,6 +52,7 @@ SESSION_COOKIE_HTTPONLY = True
 
 # Application definition
 
+# Установка драйвера PyMySQL для MySQL
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -61,18 +64,23 @@ INSTALLED_APPS = [
     'simplemathcaptcha',
 ]
 
+# Middleware для обеспечения безопасности, управления сессиями, аутентификацией и обслуживания статических файлов
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.security.SecurityMiddleware', # для обеспечения безопасности в продакшене
+    'whitenoise.middleware.WhiteNoiseMiddleware', # для обслуживания статических файлов в продакшене
+    'django.contrib.sessions.middleware.SessionMiddleware', # для управления сессиями
+    'django.middleware.common.CommonMiddleware', # для обработки общих задач, таких как редиректы и сжатие
+    'django.middleware.csrf.CsrfViewMiddleware', # для защиты от CSRF-атак
+    'django.contrib.auth.middleware.AuthenticationMiddleware', # для управления аутентификацией пользователей
+    'django.contrib.messages.middleware.MessageMiddleware', # для управления сообщениями
+    'django.middleware.clickjacking.XFrameOptionsMiddleware', # для защиты от атак clickjacking
 ]
 
-ROOT_URLCONF = 'mariupol_portal.urls'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage' # для оптимизации статических файлов в продакшене
 
+ROOT_URLCONF = 'mariupol_portal.urls' # для указания корневого URL-конфигурационного файла
+
+# Настройка шаблонов
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -143,8 +151,10 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
+# В продакшене статические файлы обслуживаются через WhiteNoise, который использует STATIC_ROOT для хранения собранных статических файлов
 STATIC_URL = '/static/'
 
+# В продакшене нужно выполнить команду collectstatic, которая соберёт все статические файлы в директорию STATIC_ROOT
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Default primary key field type
